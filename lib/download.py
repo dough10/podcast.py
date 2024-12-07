@@ -51,9 +51,9 @@ def dlWithProgressBar(url: str, path: str, progress_callback=None, max_retries=3
       logger.error(f"ERROR: An error occurred during the download: {str(e)} (Retry {retries}/{max_retries})")
 
       if retries >= max_retries:
-        logger.error(f"ERROR: Maximum retries reached. Download failed.")
-        raise DownloadError(f"Download failed after {max_retries} retries.")  # Raising a custom exception
-      time.sleep(2)  # Optionally, wait before retrying
+        logger.error(f"ERROR: Maximum ({max_retries}) retries reached. Download failed.")
+        raise DownloadError(f"Download failed after {max_retries} retries.")
+      time.sleep(2)
 
     except IOError as e:
       logger.error(f"ERROR: An I/O error occurred while writing the file: {str(e)}")

@@ -2,6 +2,13 @@ import os
 import time
 import shutil
 
+try:
+  from logs import Logs
+except ModuleNotFoundError:
+  from lib.logs import Logs
+
+logger = Logs().get_logger()
+
 def copy_file(source:str, destination:str, path:str, max_retries=5, timeout=10) -> None:
   """
   Copy a file from the source path to the destination path with retries.
@@ -21,7 +28,7 @@ def copy_file(source:str, destination:str, path:str, max_retries=5, timeout=10) 
   retries = 0
   while retries < max_retries:
     try:
-      # log(f'Copy: {source} -> {path}')
+      logger.info(f'Copy: {source} -> {path}')
       shutil.copy2(source, destination)
       # change_log.file_wrote()
       break  # Copy successful, exit the loop
@@ -30,17 +37,16 @@ def copy_file(source:str, destination:str, path:str, max_retries=5, timeout=10) 
       if retries < max_retries:
         time.sleep(timeout)
       else:
-        # log(f"{path} Maximum retries reached. Copy failed.")
+        logger.info(f"{path} Maximum retries reached. Copy failed.")
         raise  # Reraise the exception if maximum retries reached
     except FileNotFoundError as e:
-      # print(source)
-      print('error copying missing file:', e)
+      logger.critical('error copying missing file:', e)
     except shutil.Error as e:
-      # log(f"Error copying file: {str(e)}")
+      logger.info(f"Error copying file: {str(e)}")
       retries += 1
       if retries < max_retries:
-        # log(f"Retrying after {timeout} seconds...")
+        logger.info(f"Retrying after {timeout} seconds...")
         time.sleep(timeout)
       else:
-        # log(f"{path} Maximum retries reached. Copy failed.")
+        logger.info(f"{path} Maximum retries reached. Copy failed.")
         raise  # Reraise the exception if maximum retries reached
