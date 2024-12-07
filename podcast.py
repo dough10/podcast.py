@@ -190,7 +190,8 @@ class Podcast:
 
   def unsubscribe(self, window) -> None:
     def go():
-      if self.__xmlURL in []:
+      subs = subscriptions()
+      if self.__xmlURL in subs:
         pass
         # config_controler.unsubscribe(self.__xmlURL)
         # if window:
