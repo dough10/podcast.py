@@ -100,7 +100,7 @@ class Podcast:
     """
     stats = podcast_episode_exists(self.__title, episode)
 
-    if stats['path'].startswith('\\'):
+    if stats['path'].startswith('\\') or stats['path'].startswith('/'):
         stats['path'] = stats['path'][1:]
 
     # reflect download progress on UI
@@ -123,9 +123,10 @@ class Podcast:
 
 
   def __get_cover_art(self):
-    self.__coverJPG = os.path.join(self.__location, 'cover.jpg')
+    self.__coverJPG:str = os.path.join(self.__location, 'cover.jpg')
+
     if not os.path.exists(self.__coverJPG):
-      logger.info(f'getting cover art {self.__coverJPG}')
+      logger.info(f'saving cover art {self.__coverJPG}')
       res = requests.get(self.__imgURL, headers=headers)
       if res.status_code == 200:
         img = Image.open(BytesIO(res.content))
