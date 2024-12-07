@@ -21,9 +21,6 @@ logger = Logs().get_logger()
 
 load_dotenv()
 
-# file_path:str = os.path.abspath(__file__)
-# script_folder:str = os.path.dirname(file_path)
-
 
 
 class Podcast:
