@@ -53,9 +53,9 @@ if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
   echo -e "${YELLOW}Backing up ~/.bashrc to ~/.bashrc-backup${NC}"
   cp  ~/.bashrc  ~/.bashrc-backup 
 
-  if ! grep -q "~/$package/.venv/bin/python3 ~/$package/podcast.py" ~/.bashrc; then
+  if ! grep -q "~/$package/.venv/bin/python3 ~/$package/$package" ~/.bashrc; then
     echo -e "${YELLOW}Adding ${package} command to ~/.bashrc${NC}"
-    echo -e "~/$package/.venv/bin/python3 ~/$package/podcast.py" >> ~/.bashrc
+    echo -e "~/$package/.venv/bin/python3 ~/$package/$package" >> ~/.bashrc
   else
     echo -e "${YELLOW}Line already exists in .bashrc, skipping addition.${NC}"
   fi
