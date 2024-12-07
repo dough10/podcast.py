@@ -231,7 +231,7 @@ class Podcast:
 
 if __name__ == "__main__":
 
-  def subscriptions() -> list[str]:
+  def subscriptions():
     sub_list:str = os.getenv('subscriptions', '')
     return sub_list.split(',') if sub_list else []
 
