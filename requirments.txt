@@ -1,0 +1,7 @@
+art
+xmltodict
+music_tag
+tqdm
+pillow
+python_dateutil
+dotenv
