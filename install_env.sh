@@ -2,6 +2,8 @@
 
 set -e
 
+package='podcast.py'
+
 version=0.1
 
 BLACK='\033[0;30m'
@@ -20,7 +22,7 @@ echo -e "${ORANGE} _____    ______   _    _   ______   _    _  10${NC}";
 echo -e "${ORANGE}| | \ \  / |  | \ | |  | | | | ____ | |  | |   ${NC}";
 echo -e "${ORANGE}| | | |  | |  | | | |  | | | |  | | | |--| |   ${NC}";
 echo -e "${ORANGE}|_|_/_/  \_|__|_/ \_|__|_| |_|__|_| |_|  |_|   ${NC}";
-echo -e "${WHITE}Envoronment Installer v${NC}${GREEN}${version}${NC}";
+echo -e "${WHITE}${package} Envoronment Installer v${NC}${GREEN}${version}${NC}";
 echo -e ""
 echo -e "${YELLOW}Install Dependencies${NC}"
 sudo apt-get update && sudo apt-get install git python3 python3-pip -y
@@ -31,10 +33,16 @@ if ! sudo apt-get install "$PYTHON_VENV_PACKAGE" -y; then
 fi
 echo -e "${YELLOW}Dependencies Installed${NC}"
 
+echo -e "${YELLOW}Cloning Github repo${NC}"
+git clone https://github.com/dough10/$package
+echo -e "${YELLOW}Github repo cloned to ${NC}${GREEN}${package}${NC}"
+
+cd $package
+
 echo -e "${YELLOW}Setting virtual environment${NC}"
 python3 -m venv .venv
-echo -e "${YELLOW}virtual environment ${NC}${GREEN}.venv${NC}${YELLOW} created${NC}"
+echo -e "${YELLOW}virtual environment ${NC}${GREEN}${package}/.venv${NC}${YELLOW} created${NC}"
 
-echo -e "${YELLOW}Installing requirments.txt to ${NC}${GREEN}.venv${NC}"
-.venv/bin/python3 -m pip install -r requirments.txt
+echo -e "${YELLOW}Installing requirments.txt to ${NC}${GREEN}${package}/.venv${NC}"
+.venv/bin/python3 -m pip install -r requirements.txt
 echo -e "${YELLOW}requirments.txt installed${NC}"
