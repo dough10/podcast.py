@@ -23,7 +23,9 @@ logger = Logs().get_logger()
 
 load_dotenv()
 
-
+def subscriptions():
+  sub_list:str = os.getenv('subscriptions', '')
+  return sub_list.split(',') if sub_list else []
 
 class Podcast:
 
@@ -165,19 +167,21 @@ class Podcast:
 
 
   def subscribe(self, window) -> None:
-    if self.__xmlURL in []:
-      print(f'Already Subscribed to {self.__title}')
-      # if window:
-      #   window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Already Subscribed to {self.__title}");')
+    subs = subscriptions()
+    if self.__xmlURL in subs:
+      logger.info(f'Already Subscribed to {self.__title}')
+      if window:
+        window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Already Subscribed to {self.__title}");')
       return
 
-    # add url to config file
-    # config_controler.subscribe(self.__xmlURL)
+    subs.append(self.__xmlURL)
 
-    # if window:
-    #   window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Subscribed!");')
+    set_key('.env', 'subscriptions', ','.join(subs))
+
+    if window:
+      window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Subscribed!");')
     
-    print('Starting download. This may take a minuite.')
+    logger.info('Subscribed: Starting download. This may take a minuite.')
     self.downloadNewest(window)
 
 
@@ -231,14 +235,8 @@ class Podcast:
 
 
 if __name__ == "__main__":
-
-  def subscriptions():
-    sub_list:str = os.getenv('subscriptions', '')
-    return sub_list.split(',') if sub_list else []
-
-
   try:
-    Podcast(sys.argv[1]).downloadNewest(False)
+    Podcast(sys.argv[1]).subscribe(False)
   except IndexError:
     try:
       for url in subscriptions():
