@@ -34,7 +34,7 @@ class Podcast:
       logger.critical('Error connecting to the internet. Please check network connection and try again')
       sys.exit()
       
-    self.__podcast_folder:str = os.getenv('podcast_folder', 'episodes')
+    self.__podcast_folder:str = os.getenv('podcast_folder')
 
     if not os.path.exists(self.__podcast_folder):
       logger.critical(f'Folder {self.__podcast_folder} does not exist. check .env')
