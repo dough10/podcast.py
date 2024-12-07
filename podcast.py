@@ -31,19 +31,19 @@ class Podcast:
   def __init__(self, url:str):
     # check internet
     if not is_connected():
-      logger.error('Error connecting to the internet. Please check network connection and try again')
+      logger.critical('Error connecting to the internet. Please check network connection and try again')
       sys.exit()
       
     self.__podcast_folder:str = os.getenv('podcast_folder', 'episodes')
 
     if not os.path.exists(self.__podcast_folder):
-      logger.error(f'Folder {self.__podcast_folder} does not exist. check .env')
+      logger.critical(f'Folder {self.__podcast_folder} does not exist. check .env')
       sys.exit()
 
     self.__xmlURL:str = url.strip()
 
     if not is_valid_url(self.__xmlURL):
-      logger.error('Invalid URL address')
+      logger.error(f'Invalid URL address: {self.__xmlURL}')
       sys.exit()
 
     if not is_live_url(self.__xmlURL):
@@ -53,16 +53,16 @@ class Podcast:
     time_stamp:str = datetime.datetime.now().strftime('%a, %d %b %Y %H:%M:%S %z')
 
     logger.info(time_stamp)
-    logger.info(f'Fetching XML from {self.__xmlURL}')
+    logger.info(f'Fetching data from: {self.__xmlURL}')
 
     res = requests.get(self.__xmlURL, headers=headers)
     if res.status_code != 200:
-      logger.error(f'Error getting XML data. Error code {res.status_code}')
+      logger.critical(f'Error getting XML data. Error code {res.status_code}')
       sys.exit()
     try:
       xml = xmltodict.parse(res.content)
     except Exception as e:
-      logger.error(f'Error parsing XML {e}')
+      logger.critical(f'Failed parsing XML: {e}')
       sys.exit()
 
     self.__title:str = xml['rss']['channel']['title']  # the name of the podcast
@@ -75,6 +75,7 @@ class Podcast:
       self.__imgURL:str = xml['rss']['channel']['image'][0]['url']
     except KeyError:
       self.__imgURL:str = xml['rss']['channel']['itunes:image']['@href']
+
     logger.info(f'{self.__title} {str(self.episodeCount())} episodes')
 
 
@@ -106,8 +107,8 @@ class Podcast:
     # reflect download progress on UI
     def prog_update(downloaded, total, start_time):
       pass
-      # if window:
-      #   window.evaluate_js(f'document.querySelector("audiosync-podcasts").update("{self.__xmlURL}", {downloaded}, {total}, {start_time}, "{stats['filename']}")')
+      if window:
+        window.evaluate_js(f'document.querySelector("audiosync-podcasts").update("{self.__xmlURL}", {downloaded}, {total}, {start_time}, "{stats["filename"]}")')
     
     path:str = os.path.join(self.__podcast_folder, stats['path'])
 
