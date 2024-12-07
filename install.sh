@@ -45,6 +45,23 @@ echo -e "${YELLOW}virtual environment ${NC}${GREEN}${package}/.venv${NC}${YELLOW
 
 echo -e "${YELLOW}Installing requirments.txt to ${NC}${GREEN}${package}/.venv${NC}"
 .venv/bin/python3 -m pip install -r requirements.txt
-echo -e "${green}${package}/requirments.txt${NC}${YELLOW} installed${NC}"
+echo -e "${GREEN}${package}/requirments.txt${NC}${YELLOW} installed${NC}"
+
+echo "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n)${NC}"
+read -r response
+if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
+  echo -e "${YELLOW}Backing up ~/.bashrc to ~/.bashrc-backup${NC}"
+  cp  ~/.bashrc  ~/.bashrc-backup 
+
+  if ! grep -q "~/$package/.venv/bin/python3 ~/$package/podcast.py" ~/.bashrc; then
+    echo -e "${YELLOW}Adding ${package} command to ~/.bashrc${NC}"
+    echo -e "~/$package/.venv/bin/python3 ~/$package/podcast.py" >> ~/.bashrc
+  else
+    echo -e "${YELLOW}Line already exists in .bashrc, skipping addition.${NC}"
+  fi
+fi
+
+echo -e "${YELLOW}Installing global commands${NC}"
+sudo ln -sfv ~/$package/uninstall.sh /usr/local/bin/${package}_uninstall
 
 echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${YELLOW} to configure environment.${NC}"
