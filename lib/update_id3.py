@@ -114,12 +114,11 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
       file['comment'] = episode['itunes:subtitle']
 
     # Set year tag
-    date_str:str = datetime.datetime.strptime(episode['pubDate'], '%a, %d %b %Y %H:%M:%S %z')
     try:
-      pub_date = date_str
+      pub_date = datetime.datetime.strptime(episode['pubDate'], '%a, %d %b %Y %H:%M:%S %z')
     except (ValueError, TypeError):
       try:
-        pub_date = date_str
+        pub_date = datetime.datetime.strptime(episode['pubDate'], '%a, %d %b %Y %H:%M:%S %Z')
       except (ValueError, TypeError) as e:
         logger.error(f"Error setting year tag: {str(e)}")
         pub_date = None
