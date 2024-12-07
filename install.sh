@@ -69,5 +69,6 @@ sudo ln -sfv ~/$package/sh/update.sh /usr/local/bin/${package}_update
 echo -e "${YELLOW}Adding execute permissions${NC}"
 chmod +x -v sh/*.sh
 chmod +x -v *.sh
+chmod +x -v $package
 
 echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${YELLOW} to configure environment.${NC}"
