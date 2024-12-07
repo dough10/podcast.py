@@ -45,4 +45,6 @@ echo -e "${YELLOW}virtual environment ${NC}${GREEN}${package}/.venv${NC}${YELLOW
 
 echo -e "${YELLOW}Installing requirments.txt to ${NC}${GREEN}${package}/.venv${NC}"
 .venv/bin/python3 -m pip install -r requirements.txt
-echo -e "${YELLOW}requirments.txt installed${NC}"
+echo -e "${green}${package}/requirments.txt${NC}${YELLOW} installed${NC}"
+
+echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${YELLOW} to configure environment.${NC}"
