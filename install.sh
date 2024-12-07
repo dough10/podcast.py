@@ -63,5 +63,7 @@ fi
 
 echo -e "${YELLOW}Installing global commands${NC}"
 sudo ln -sfv ~/$package/uninstall.sh /usr/local/bin/${package}_uninstall
+sudo ln -sfv ~/$package/sh/update.sh /usr/local/bin/${package}_update
+
 
 echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${YELLOW} to configure environment.${NC}"
