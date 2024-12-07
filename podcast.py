@@ -113,10 +113,10 @@ class Podcast:
 
     # check if the file exists
     if os.path.isfile(path):
-      logger.info(f'Episode {stats['filename']} already downloaded')
+      logger.info(f'Episode {stats["filename"]} already downloaded')
       return
     
-    logger.info(f'Downloading - {stats['filename']}')
+    logger.info(f'Downloading - {stats["filename"]}')
     # download the file and update ui with progress
     dlWithProgressBar(stats['url'], path, progress_callback=prog_update)
     # tag file with info
