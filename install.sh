@@ -47,6 +47,18 @@ echo -e "${YELLOW}Installing requirments.txt to ${NC}${GREEN}${package}/.venv${N
 .venv/bin/python3 -m pip install -r requirements.txt
 echo -e "${GREEN}${package}/requirments.txt${NC}${YELLOW} installed${NC}"
 
+echo -e "${YELLOW}Installing global commands${NC}"
+sudo ln -sfv ~/$package/uninstall.sh /usr/local/bin/${package}_uninstall
+sudo ln -sfv ~/$package/sh/reinstall.sh /usr/local/bin/${package}_reinstall
+sudo ln -sfv ~/$package/sh/update.sh /usr/local/bin/${package}_update
+
+echo -e "${YELLOW}Adding execute permissions${NC}"
+chmod +x -v sh/*.sh
+chmod +x -v *.sh
+chmod +x -v $package
+
+echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${YELLOW} to configure environment.${NC}"
+
 echo -e "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n)${NC}"
 read -r response
 if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
@@ -60,15 +72,3 @@ if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
     echo -e "${YELLOW}Line already exists in .bashrc, skipping addition.${NC}"
   fi
 fi
-
-echo -e "${YELLOW}Installing global commands${NC}"
-sudo ln -sfv ~/$package/uninstall.sh /usr/local/bin/${package}_uninstall
-sudo ln -sfv ~/$package/sh/reinstall.sh /usr/local/bin/${package}_reinstall
-sudo ln -sfv ~/$package/sh/update.sh /usr/local/bin/${package}_update
-
-echo -e "${YELLOW}Adding execute permissions${NC}"
-chmod +x -v sh/*.sh
-chmod +x -v *.sh
-chmod +x -v $package
-
-echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${YELLOW} to configure environment.${NC}"
