@@ -7,7 +7,7 @@ except ModuleNotFoundError:
   from lib.format_filename import format_filename
 
 
-def podcast_episode_exists(podcastTitle:str, episode) -> dict[bool, str]:
+def podcast_episode_exists(podcastTitle:str, episode):
   folder = os.getenv('podcast_folder')
 
   # URL!!!
