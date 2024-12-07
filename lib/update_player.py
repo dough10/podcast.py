@@ -7,17 +7,21 @@ import shutil
 import datetime
 
 try:
+  from logs import Logs
   from old_date import old_date
   from audio_formats import audio_formats 
   from copy_file import copy_file
   from question import question
   from escape_folder import escape_folder
 except ModuleNotFoundError:
+  from lib.logs import Logs
   from lib.old_date import old_date
   from lib.audio_formats import audio_formats 
   from lib.copy_file import copy_file
   from lib.question import question
   from lib.escape_folder import escape_folder
+
+logger = Logs().get_logger()
 
 # count audio file in the given directory
 def playable_file_count(dir:str) -> int:
@@ -43,7 +47,7 @@ def list_of_old_files(path:str) -> list[str]:
   ]
 
 
-def updatePlayer(player:str, window, bypass=False, logger=print):
+def updatePlayer(player:str, window, bypass=False) -> None:
   start_time = time.time()
   
   folder = os.getenv('podcast_folder')
@@ -56,7 +60,7 @@ def updatePlayer(player:str, window, bypass=False, logger=print):
     raise FileNotFoundError(f"Error accessing {player}. Check if the drive is mounted")
   
   if not bypass:
-    print('Begining sync. This may take a while')
+    logger.info('Begining sync. This may take a while')
 
   podcast_folder_on_player = os.path.join(player, 'Podcasts')
   if not os.path.exists(podcast_folder_on_player):
@@ -71,13 +75,13 @@ def updatePlayer(player:str, window, bypass=False, logger=print):
   last_ndx = 0
   # copy/remove files
   for ndx, dir in enumerate(tqdm(dirs, desc='Updating Podcasts', unit='podcast')):
-    src = os.path.join(folder, dir) # where all the files are located
-    src_art = os.path.join(src, 'cover.jpg')
-    dest = os.path.join(podcast_folder_on_player, dir) # where we will send the files
-    dest_art = os.path.join(dest, 'cover.jpg')
+    src:str = os.path.join(folder, dir) # where all the files are located
+    src_art:str = os.path.join(src, 'cover.jpg')
+    dest:str = os.path.join(podcast_folder_on_player, dir) # where we will send the files
+    dest_art:str = os.path.join(dest, 'cover.jpg')
     files_to_add = list_of_new_files(src)
     files_to_delete = list_of_old_files(dest)
-    num_files = len(files_to_add)
+    num_files:int = len(files_to_add)
     # create folder if there are files to write in it
     if not os.path.exists(dest) and num_files > 0:
       try:
@@ -152,8 +156,8 @@ def updatePlayer(player:str, window, bypass=False, logger=print):
   if bypass:
     return 
   
-  # print(change_log.print(time.time() - start_time))
+  # logger.info(change_log.print(time.time() - start_time))
   
   if question(f'Would you like to eject {player} (yes/no) '):
-    print('Please wait for prompt before removing the drive')
+    logger.warning('Please wait for prompt before removing the drive')
     os.system(f'diskutil eject {escape_folder(player)}')

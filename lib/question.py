@@ -1,3 +1,10 @@
+try:
+  from logs import Logs
+except ModuleNotFoundError:
+  from lib.logs import Logs
+
+logger = Logs().get_logger()
+
 # request yes, no / true, false input from user
 def question(q):
   while True:
@@ -7,4 +14,4 @@ def question(q):
     elif answer in ['no', 'n', '0']:
       return False
     else:
-      print('Invalid option. Please enter "yes" or "no".')
+      logger.info('Invalid option. Please enter "yes" or "no".')
