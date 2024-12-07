@@ -21,14 +21,14 @@ logger = Logs().get_logger()
 
 load_dotenv()
 
-file_path:str = os.path.abspath(__file__)
-script_folder:str = os.path.dirname(file_path)
+# file_path:str = os.path.abspath(__file__)
+# script_folder:str = os.path.dirname(file_path)
 
 
 
 class Podcast:
 
-  def __init__(self, url:str):
+  def __init__(self, url:str) -> None:
     # check internet
     if not is_connected():
       logger.critical('Error connecting to the internet. Please check network connection and try again')
@@ -79,7 +79,7 @@ class Podcast:
     logger.info(f'{self.__title}: {str(self.episodeCount())} episodes')
 
 
-  def fallback_image(self, file):
+  def fallback_image(self, file) -> None:
     logger.info('using fallback image')
     if hasattr(self, '__image'):
       id3Image(file, self.__image)
@@ -88,7 +88,7 @@ class Podcast:
       id3Image(file, self.__image)
 
 
-  def __fileDL(self, episode, epNum, window):
+  def __fileDL(self, episode, epNum, window) -> None:
     """
     Downloads a podcast episode and sets the ID3 tags for the downloaded file.
 
@@ -124,7 +124,7 @@ class Podcast:
     update_ID3(self.__title, episode, path, epNum, self.fallback_image)
 
 
-  def __get_cover_art(self):
+  def __get_cover_art(self) -> None:
     self.__coverJPG:str = os.path.join(self.__location, 'cover.jpg')
 
     if not os.path.exists(self.__coverJPG):
@@ -147,7 +147,7 @@ class Podcast:
       self.__image = img
 
 
-  def __mkdir(self):
+  def __mkdir(self) -> None:
     if not os.path.exists(self.__podcast_folder):
       logger.error(f'Error accessing location {self.__podcast_folder}')
       logger.error('Check if network drive is mounted')
@@ -161,11 +161,11 @@ class Podcast:
     self.__get_cover_art()
 
 
-  def episodeCount(self):
+  def episodeCount(self) -> int:
     return len(self.__list)
 
 
-  def subscribe(self, window):
+  def subscribe(self, window) -> None:
     if self.__xmlURL in []:
       print(f'Already Subscribed to {self.__title}')
       # if window:
@@ -182,7 +182,7 @@ class Podcast:
     self.downloadNewest(window)
 
 
-  def unsubscribe(self, window):
+  def unsubscribe(self, window) -> None:
     def go():
       if self.__xmlURL in []:
         pass
@@ -207,20 +207,21 @@ class Podcast:
         except:
           pass
 
-  def downloadNewest(self, window):
+
+  def downloadNewest(self, window) -> None:
     self.__mkdir()
     self.__fileDL(self.__list[0], self.episodeCount(), window)
     logger.info('download complete')
 
 
-  def downloadAll(self, window):
+  def downloadAll(self, window) -> None:
     self.__mkdir()
     for ndx, episode in enumerate(self.__list):
       self.__fileDL(episode, self.episodeCount() - ndx, window)
     logger.info('download complete')
 
 
-  def downloadCount(self, count, window):
+  def downloadCount(self, count, window) -> None:
     self.__mkdir()
     for ndx in range(count):
       self.__fileDL(self.__list[ndx], self.episodeCount() - ndx, window)
