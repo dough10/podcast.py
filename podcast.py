@@ -6,7 +6,7 @@ import datetime
 import xmltodict
 from PIL import Image
 from io import BytesIO
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 
 from lib.question import question
 from lib.format_filename import format_filename
@@ -230,11 +230,17 @@ class Podcast:
 
 
 if __name__ == "__main__":
+
+  def subscriptions() -> list[str]:
+    sub_list:str = os.getenv('subscriptions', '')
+    return sub_list.split(',') if sub_list else []
+
+
   try:
     Podcast(sys.argv[1]).downloadNewest(False)
   except IndexError:
     try:
-      for url in []:
+      for url in subscriptions():
         Podcast(url).downloadNewest(False)
     except Exception as e:
       print(e)
