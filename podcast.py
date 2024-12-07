@@ -76,7 +76,7 @@ class Podcast:
     except KeyError:
       self.__imgURL:str = xml['rss']['channel']['itunes:image']['@href']
 
-    logger.info(f'{self.__title} {str(self.episodeCount())} episodes')
+    logger.info(f'{self.__title}: {str(self.episodeCount())} episodes')
 
 
   def fallback_image(self, file):
