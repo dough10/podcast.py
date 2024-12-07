@@ -47,7 +47,7 @@ echo -e "${YELLOW}Installing requirments.txt to ${NC}${GREEN}${package}/.venv${N
 .venv/bin/python3 -m pip install -r requirements.txt
 echo -e "${GREEN}${package}/requirments.txt${NC}${YELLOW} installed${NC}"
 
-echo "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n)${NC}"
+echo -e "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n)${NC}"
 read -r response
 if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
   echo -e "${YELLOW}Backing up ~/.bashrc to ~/.bashrc-backup${NC}"
@@ -63,7 +63,11 @@ fi
 
 echo -e "${YELLOW}Installing global commands${NC}"
 sudo ln -sfv ~/$package/uninstall.sh /usr/local/bin/${package}_uninstall
+sudo ln -sfv ~/$package/sh/reinstall.sh /usr/local/bin/${package}_reinstall
 sudo ln -sfv ~/$package/sh/update.sh /usr/local/bin/${package}_update
 
+echo -e "${YELLOW}Installing global commands${NC}"
+chmod +x sh/*.sh
+chmod +x *.sh
 
 echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${YELLOW} to configure environment.${NC}"
