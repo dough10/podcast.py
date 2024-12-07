@@ -22,7 +22,7 @@ echo -e "${ORANGE} _____    ______   _    _   ______   _    _  10${NC}";
 echo -e "${ORANGE}| | \ \  / |  | \ | |  | | | | ____ | |  | |   ${NC}";
 echo -e "${ORANGE}| | | |  | |  | | | |  | | | |  | | | |--| |   ${NC}";
 echo -e "${ORANGE}|_|_/_/  \_|__|_/ \_|__|_| |_|__|_| |_|  |_|   ${NC}";
-echo -e "${WHITE}${package} Envoronment Installer v${NC}${GREEN}${version}${NC}";
+echo -e "${GREY}${package}${NC}${WHITE} Envoronment Installer v${NC}${GREEN}${version}${NC}";
 echo -e ""
 echo -e "${YELLOW}Install Dependencies${NC}"
 sudo apt-get update && sudo apt-get install git python3 python3-pip -y
