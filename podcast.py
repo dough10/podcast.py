@@ -176,7 +176,10 @@ class Podcast:
 
     subs.append(self.__xmlURL)
 
-    set_key('.env', 'subscriptions', ','.join(subs))
+    file_path = os.path.abspath(__file__)
+    script_folder = os.path.dirname(file_path)
+
+    set_key(os.path.join(script_folder, '.env'), 'subscriptions', ','.join(subs))
 
     if window:
       window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Subscribed!");')
