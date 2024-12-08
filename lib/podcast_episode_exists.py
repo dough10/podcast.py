@@ -25,7 +25,7 @@ def podcast_episode_exists(podcastTitle:str, episode):
   path:str = os.path.join(__location, filename)
   
   return {
-    'exists': os.path.exists(path), 
+    'exists': os.path.exists(path) and os.path.isfile(path), 
     'path': path.replace(folder, ''), 
     'filename': filename, 
     'url': download_url

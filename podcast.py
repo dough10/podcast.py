@@ -23,6 +23,9 @@ logger = Logs().get_logger()
 
 load_dotenv()
 
+file_path = os.path.abspath(__file__)
+script_folder = os.path.dirname(file_path)
+
 def subscriptions():
   sub_list:str = os.getenv('subscriptions', '')
   return sub_list.split(',') if sub_list else []
@@ -110,13 +113,13 @@ class Podcast:
       pass
       if window:
         window.evaluate_js(f'document.querySelector("audiosync-podcasts").update("{self.__xmlURL}", {downloaded}, {total}, {start_time}, "{stats["filename"]}")')
-    
-    path:str = os.path.join(self.__podcast_folder, stats['path'])
 
     # check if the file exists
-    if os.path.isfile(path):
+    if stats['exists']:
       logger.info(f'Episode {stats["filename"]} already downloaded')
       return
+    
+    path:str = os.path.join(self.__podcast_folder, stats['path'])
     
     logger.info(f'Downloading - {stats["filename"]}')
     # download the file and update ui with progress
@@ -176,9 +179,6 @@ class Podcast:
 
     subs.append(self.__xmlURL)
 
-    file_path = os.path.abspath(__file__)
-    script_folder = os.path.dirname(file_path)
-
     set_key(os.path.join(script_folder, '.env'), 'subscriptions', ','.join(subs))
 
     if window:
@@ -192,18 +192,18 @@ class Podcast:
     def go():
       subs = subscriptions()
       if self.__xmlURL in subs:
-        pass
-        # config_controler.unsubscribe(self.__xmlURL)
-        # if window:
-        #   try: 
-        #     shutil.rmtree(self.__location)
-        #     print(f'Deleteing directory {self.__location}')
-        #   except:
-        #     pass
+        updated = [x for x in subs if x != self.__xmlURL]
+        set_key(os.path.join(script_folder, '.env'), 'subscriptions', ','.join(updated))
+        if window:
+          try: 
+            shutil.rmtree(self.__location)
+            print(f'Deleteing directory {self.__location}')
+          except:
+            pass
           
-    # if window:
-    #   go()
-    #   return
+    if window:
+      go()
+      return
 
     if question(f'is "{self.__title}" the right podcast? (yes/no) '):
       go()
@@ -246,4 +246,4 @@ if __name__ == "__main__":
       for url in subscriptions():
         Podcast(url).downloadNewest(False)
     except Exception as e:
-      print(e)
+      logger.error(e)
