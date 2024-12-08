@@ -1,8 +1,4 @@
 #!/bin/bash
 
-current_directory=$(pwd)
-
-parent_directory=$(dirname "$current_directory")
-
-cd $parent_directory
+cd ~/podcast.py || exit
 git pull
