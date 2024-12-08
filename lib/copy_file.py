@@ -31,14 +31,14 @@ def copy_file(source:str, destination:str, path:str, max_retries=5, timeout=10) 
       logger.info(f'Copy: {source} -> {path}')
       shutil.copy2(source, destination)
       # change_log.file_wrote()
-      break  # Copy successful, exit the loop
+      break
     except PermissionError:
       retries += 1
       if retries < max_retries:
         time.sleep(timeout)
       else:
         logger.info(f"{path} Maximum retries reached. Copy failed.")
-        raise  # Reraise the exception if maximum retries reached
+        raise
     except FileNotFoundError as e:
       logger.critical('error copying missing file:', e)
     except shutil.Error as e:
@@ -49,4 +49,4 @@ def copy_file(source:str, destination:str, path:str, max_retries=5, timeout=10) 
         time.sleep(timeout)
       else:
         logger.info(f"{path} Maximum retries reached. Copy failed.")
-        raise  # Reraise the exception if maximum retries reached
+        raise
