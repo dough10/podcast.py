@@ -62,7 +62,7 @@ echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${Y
 echo -e "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n)${NC}"
 read -r response
 if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
-  echo -e "${YELLOW}Backing up ${NC}${GREEN}~/.bashrc${NC}${YELLOW} to ~/.bashrc-backup${NC}"
+  echo -e "${YELLOW}Backing up ${NC}${GREEN}~/.bashrc${NC}${YELLOW} to ${NC}${GREEN}~/.bashrc-backup${NC}"
   cp  ~/.bashrc  ~/.bashrc-backup 
 
   if ! grep -q "~/$package/.venv/bin/python3 ~/$package/$package" ~/.bashrc; then
