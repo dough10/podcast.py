@@ -236,14 +236,38 @@ class Podcast:
 
 
 
-
-
 if __name__ == "__main__":
   try:
-    Podcast(sys.argv[1]).subscribe(False)
-  except IndexError:
+    if len(sys.argv) > 1:
+      podcast_url = sys.argv[1]
+      action = sys.argv[2] if len(sys.argv) > 2 else ''
+
+      sub = ['subscribe', 'sub', 's']
+      unsub = ['unsubscribe', 'unsub', 'u']
+      
+      if action.lower() in sub:
+        Podcast(podcast_url).subscribe(False)
+      elif action.lower() in unsub:
+        Podcast(podcast_url).unsubscribe(False)
+      else:
+        while True:
+          answer = input("Please choose: subscribe or unsubscribe: ")
+          if answer.lower() in sub:
+            Podcast(podcast_url).subscribe(False)
+            break
+          elif answer.lower() in unsub:
+            Podcast(podcast_url).unsubscribe(False)
+            break
+          else:
+            print('Invalid option. Please enter subscribe or unsubscribe.')
+        print('Finished!')
+    else:
+      raise IndexError("Updating podcasts.")
+
+  except IndexError as e:
+    print(e)
     try:
       for url in subscriptions():
         Podcast(url).downloadNewest(False)
     except Exception as e:
-      logger.error(e)
+      logger.error(f"Error downloading podcast: {e}")

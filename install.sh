@@ -48,13 +48,14 @@ echo -e "${YELLOW}Installing requirments.txt to ${NC}${GREEN}${package}/.venv${N
 echo -e "${GREEN}${package}/requirments.txt${NC}${YELLOW} installed${NC}"
 
 echo -e "${YELLOW}Installing global commands${NC}"
+sudo ln -sfv ~/$package/sh/podcast.sh /usr/local/bin/${package}
 sudo ln -sfv ~/$package/uninstall.sh /usr/local/bin/${package}_uninstall
 sudo ln -sfv ~/$package/sh/reinstall.sh /usr/local/bin/${package}_reinstall
 sudo ln -sfv ~/$package/sh/update.sh /usr/local/bin/${package}_update
 
 echo -e "${YELLOW}Adding execute permissions${NC}"
 chmod +x -v sh/*.sh
-chmod +x -v *.sh
+chmod +x -v ./*.sh
 chmod +x -v $package
 
 echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${YELLOW} to configure environment.${NC}"
