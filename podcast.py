@@ -260,12 +260,10 @@ if __name__ == "__main__":
             break
           else:
             print('Invalid option. Please enter subscribe or unsubscribe.')
-        print('Finished!')
     else:
       raise IndexError("Updating podcasts.")
 
   except IndexError as e:
-    print(e)
     try:
       for url in subscriptions():
         Podcast(url).downloadNewest(False)
