@@ -57,7 +57,7 @@ chmod +x -v sh/*.sh
 chmod +x -v ./*.sh
 chmod +x -v $package
 
-echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ${package}/.env${NC}${YELLOW} to configure environment.${NC}"
+echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ~/${package}/.env${NC}${YELLOW} to configure environment.${NC}"
 
 echo -e "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n) This will run podcast.py when terminal is opened${NC}"
 read -r response
