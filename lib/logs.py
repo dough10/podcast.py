@@ -9,7 +9,7 @@ load_dotenv()
 app = "podcast"
 
 # Fetch log level from the environment variable (default to 'WARNING')
-log_level_str = os.getenv('LOG_LEVEL', 'debug').upper()
+log_level_str = os.getenv('LOG_LEVEL', 'error').upper()
 
 try:
   log_level = getattr(logging, log_level_str)
@@ -46,8 +46,6 @@ class Logs:
       stream_handler = logging.StreamHandler()
       stream_handler.setFormatter(formatter)
       self.__logger.addHandler(stream_handler)
-
-      self.__logger.info(f"Log level set to: {log_level_str}")
 
   def get_logger(self) -> logging:
     """
