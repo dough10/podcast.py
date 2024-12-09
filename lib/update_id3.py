@@ -155,7 +155,7 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
 
             # Convert image to RGB mode if it's in RGBA mode
             logger.debug(f'image mode: {img.mode}')
-            if img.mode == 'RGBA':
+            if img.mode != 'RGB':
               img = img.convert('RGB')
 
             bytes = BytesIO()
