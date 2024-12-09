@@ -9,7 +9,7 @@ load_dotenv()
 app = "podcast"
 
 # Fetch log level from the environment variable (default to 'WARNING')
-log_level_str = os.getenv('LOG_LEVEL', 'error').upper()
+log_level_str = os.getenv('log_level', 'error').upper()
 
 try:
   log_level = getattr(logging, log_level_str)
