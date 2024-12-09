@@ -239,27 +239,23 @@ class Podcast:
 if __name__ == "__main__":
   try:
     if len(sys.argv) > 1:
-      podcast_url = sys.argv[1]
-      action = sys.argv[2] if len(sys.argv) > 2 else ''
+      podcast_url:str = sys.argv[1]
+      action:str = sys.argv[2] if len(sys.argv) > 2 else ''
 
       sub = ['subscribe', 'sub', 's']
       unsub = ['unsubscribe', 'unsub', 'u']
       
-      if action.lower() in sub:
-        Podcast(podcast_url).subscribe(False)
-      elif action.lower() in unsub:
-        Podcast(podcast_url).unsubscribe(False)
-      else:
-        while True:
-          answer = input("Please choose: subscribe or unsubscribe: ")
-          if answer.lower() in sub:
-            Podcast(podcast_url).subscribe(False)
-            break
-          elif answer.lower() in unsub:
-            Podcast(podcast_url).unsubscribe(False)
-            break
-          else:
-            print('Invalid option. Please enter subscribe or unsubscribe.')
+
+      while True:
+        answer = action if action != '' else input("Please choose: subscribe or unsubscribe: ")
+        if answer.lower() in sub:
+          Podcast(podcast_url).subscribe(False)
+          break
+        elif answer.lower() in unsub:
+          Podcast(podcast_url).unsubscribe(False)
+          break
+        else:
+          print('Invalid option. Please enter subscribe or unsubscribe.')
     else:
       raise IndexError("Updating podcasts.")
 
