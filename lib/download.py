@@ -25,12 +25,12 @@ def dlWithProgressBar(url: str, path: str, progress_callback=None, max_retries=3
       media = session.get(url, stream=True, headers=headers)
       media.raise_for_status()  # Raise an exception for any HTTP errors (status code >= 400)
 
+      print(path)
       total_bytes = int(media.headers.get('content-length', 0))
       bytes_downloaded = 0
       start_time = round(time.time() * 1000)
       progress = tqdm(total=total_bytes, unit='iB', unit_scale=True)
 
-      print(path)
       with open(path, 'wb', buffering=chunk_size) as file:
         for data in media.iter_content(chunk_size):
           bytes_downloaded += len(data)
