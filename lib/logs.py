@@ -33,20 +33,18 @@ class Logs:
       backup_count (int): The number of backup log files to keep. Default is 5.
     """ 
     self.__logger = logging.getLogger(app)
-    self.__logger.setLevel(logging.DEBUG) 
+    self.__logger.setLevel(log_level)
 
     if not self.__logger.hasHandlers():
       # Create a rotating file handler
       file_handler = RotatingFileHandler(f'{app}.log', maxBytes=max_bytes, backupCount=backup_count)
       formatter = logging.Formatter('%(asctime)s %(filename)s:%(levelname)s - %(message)s')
       file_handler.setFormatter(formatter)
-      file_handler.setLevel(log_level)
       self.__logger.addHandler(file_handler)
 
       # Create a stream handler for console output
       stream_handler = logging.StreamHandler()
       stream_handler.setFormatter(formatter)
-      stream_handler.setLevel(logging.DEBUG)
       self.__logger.addHandler(stream_handler)
 
   def get_logger(self) -> logging:
