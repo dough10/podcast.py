@@ -82,10 +82,6 @@ class Podcast:
       logger.critical(f'Error connecting to: {self.__xmlURL}')
       return
 
-    # Log the current timestamp
-    time_stamp: str = datetime.datetime.now().strftime('%a, %d %b %Y %H:%M:%S %z')
-    logger.info(time_stamp)
-
     # Fetch podcast XML feed
     try:
       logger.info(f'Fetching data from: {self.__xmlURL}')
