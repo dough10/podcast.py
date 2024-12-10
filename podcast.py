@@ -141,6 +141,11 @@ class Podcast:
     """
     stats = podcast_episode_exists(self.__title, episode)
 
+    # Check if the episode has already been downloaded
+    if stats['exists']:
+      logger.info(f'Episode {stats["filename"]} already downloaded')
+      return
+
     # Ensure the file path is correctly formatted
     if stats['path'].startswith('\\') or stats['path'].startswith('/'):
       stats['path'] = stats['path'][1:]
@@ -149,11 +154,6 @@ class Podcast:
     def prog_update(downloaded, total, start_time):
       if window:
         window.evaluate_js(f'document.querySelector("audiosync-podcasts").update("{self.__xmlURL}", {downloaded}, {total}, {start_time}, "{stats["filename"]}")')
-
-    # Check if the episode has already been downloaded
-    if stats['exists']:
-      logger.info(f'Episode {stats["filename"]} already downloaded')
-      return
 
     # Prepare the path to save the downloaded episode
     path: str = os.path.join(self.__podcast_folder, stats['path'])

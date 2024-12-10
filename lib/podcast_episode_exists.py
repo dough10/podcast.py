@@ -7,7 +7,7 @@ except ModuleNotFoundError:
   from lib.format_filename import format_filename
 
 
-def podcast_episode_exists(podcastTitle:str, episode):
+def podcast_episode_exists(podcast_title:str, episode):
   folder = os.getenv('podcast_folder')
 
   # URL!!!
@@ -17,12 +17,13 @@ def podcast_episode_exists(podcastTitle:str, episode):
   file_ext:str = os.path.splitext(urlparse(download_url).path)[-1]
 
   try:
-    filename:str = format_filename(f"S{episode['itunes:season']}.E{episode['itunes:episode']}.{episode['title']}{file_ext}").replace(' ','.')
+    filename:str = format_filename(f"S{episode['itunes:season']}.E{episode['itunes:episode']}.{episode['title']}{file_ext}")
   except KeyError:
-    filename:str = format_filename(f"{episode['title']}{file_ext}").replace(' ','.')
+    filename:str = format_filename(f"{episode['title']}{file_ext}")
   
-  __location:str = os.path.join(folder, format_filename(podcastTitle))
-  path:str = os.path.join(__location, filename)
+  filename:str = filename.replace(' ','.')
+  location:str = os.path.join(folder, format_filename(podcast_title))
+  path:str = os.path.join(location, filename)
   
   return {
     'exists': os.path.exists(path) and os.path.isfile(path), 
