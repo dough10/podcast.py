@@ -87,17 +87,19 @@ class Podcast:
     logger.info(time_stamp)
 
     # Fetch podcast XML feed
-    logger.info(f'Fetching data from: {self.__xmlURL}')
-    res = requests.get(self.__xmlURL, headers=headers)
-    if res.status_code != 200:
-      logger.critical(f'Error getting XML data. Error code {res.status_code}')
-      return
-
-    # Parse the XML content
     try:
+      logger.info(f'Fetching data from: {self.__xmlURL}')
+      res = requests.get(self.__xmlURL, headers=headers)
+      res.raise_for_status()
       xml = xmltodict.parse(res.content)
+    except requests.exceptions.RequestException as e:
+      logger.critical(f'Error getting XML data from {self.__xmlURL}: {e}')
+      return
+    except ValueError as e:
+      logger.critical(f'Failed parsing XML from {self.__xmlURL}: {e}')
+      return
     except Exception as e:
-      logger.critical(f'Failed parsing XML: {e}')
+      logger.critical(f'Unexpected error: {e}')
       return
 
     # Extract podcast title and episode list from the XML
@@ -107,13 +109,16 @@ class Podcast:
 
     # Extract cover image URL (handle different XML structures)
     try:
-      self.__imgURL: str = xml['rss']['channel']['image']['url']
+      self.__img_url: str = xml['rss']['channel']['image']['url']
     except TypeError:
-      self.__imgURL: str = xml['rss']['channel']['image'][0]['url']
+      self.__img_url: str = xml['rss']['channel']['image'][0]['url']
     except KeyError:
-      self.__imgURL: str = xml['rss']['channel']['itunes:image']['@href']
+      self.__img_url: str = xml['rss']['channel']['itunes:image']['@href']
+    except Exception as e:
+      logger.critical(f'Failed finding image url: {e}')
 
-    logger.info(f'{self.__title}: {str(self.episodeCount())} episodes')
+    ep_count = self.episodeCount()
+    logger.info(f'{self.__title}: {str(ep_count)} episodes')
 
   def fallback_image(self, file) -> None:
     """
@@ -127,7 +132,7 @@ class Podcast:
     if hasattr(self, '__image'):
       id3Image(file, self.__image)  # Update the ID3 tags with the image
     else:
-      self.__image = load_saved_image(self.__coverJPG)  # Load a saved image if available
+      self.__image = load_saved_image(self.__cover_jpg)  # Load a saved image if available
       id3Image(file, self.__image)  # Update the ID3 tags with the image
 
   def __fileDL(self, episode, epNum, window) -> None:
@@ -170,14 +175,14 @@ class Podcast:
     Downloads and saves the podcast cover art if it is not already saved.
     The cover art is saved as 'cover.jpg' in the podcast's folder.
     """
-    self.__coverJPG: str = os.path.join(self.__location, 'cover.jpg')
+    self.__cover_jpg: str = os.path.join(self.__location, 'cover.jpg')
 
-    if os.path.exists(self.__coverJPG):
-      logger.debug(f'Cover exists: {self.__coverJPG}')
+    if os.path.exists(self.__cover_jpg):
+      logger.debug(f'Cover exists: {self.__cover_jpg}')
       return
     # If cover art is not available, download it
-    logger.debug(f'Fetching image from: {self.__imgURL}')
-    res = requests.get(self.__imgURL, headers=headers)
+    logger.debug(f'Fetching image from: {self.__img_url}')
+    res = requests.get(self.__img_url, headers=headers)
     if res.status_code == 200:
       img = Image.open(BytesIO(res.content))
     else:
@@ -187,14 +192,14 @@ class Podcast:
     width, height = img.size
     # Resize image if too large
     if width > 1000 or height > 1000:
-      logger.debug('Resizing image to: 1000pxX1000px')
+      logger.debug(f'Resizing image: {width}px X {height}px -> 1000px X 1000px')
       img.thumbnail((1000, 1000), Image.LANCZOS)
     if img.mode != 'RGB':
-      logger.debug('Convertings image mode to: RGB')
+      logger.debug(f'Convertings image mode: {img.mode} -> RGB')
       img = img.convert('RGB')
     try:
-      logger.info(f'Saving cover art to: {self.__coverJPG}')
-      img.save(self.__coverJPG, 'JPEG')
+      logger.info(f'Saving cover art to: {self.__cover_jpg}')
+      img.save(self.__cover_jpg, 'JPEG')
     except OSError as e:
       logger.error(f'Can not save cover image as JPG: {e}')
       return
@@ -206,9 +211,9 @@ class Podcast:
     Also, fetches and saves the cover art for the podcast.
     """
     if not os.path.exists(self.__podcast_folder):
-      s:str = f'Error accessing location {self.__podcast_folder}, Check if drive is mounted'
-      logger.error(s)
-      raise Exception(s)
+      error_str:str = f'Error accessing location {self.__podcast_folder}, Check if drive is mounted'
+      logger.error(error_str)
+      raise Exception(error_str)
 
     if not os.path.exists(self.__location):
       logger.info(f'Creating folder {self.__location}')
