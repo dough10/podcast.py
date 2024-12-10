@@ -17,8 +17,16 @@ except ModuleNotFoundError:
 logger = Logs().get_logger()
 
 
+get_ep_number_from_title = [
+  'Hospital Records Podcast'
+]
+
+def number_is_not_year(num):
+  return num < 2000
+
 # save a downloaded image as a temp file
 def save_image_to_tempfile(img):
+  
   try:
     with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp_file:
       if isinstance(img, bytes):
@@ -27,22 +35,28 @@ def save_image_to_tempfile(img):
         img.save(tmp_file, format='JPEG')
       tmp_file_path = tmp_file.name
       return tmp_file_path
+  except IOError as e:
+    raise IOError(f"Error creating temp_file: {str(e)}")
   except Exception as e:
-      logger.error(f"Error saving image to tempfile: {str(e)}")
-      return None
+    raise Exception(f"Error saving image to tempfile: {str(e)}")
 
 def load_saved_image(location:str) -> bytes:
-  if os.path.exists(location):
-    try:
-      img = Image.open(location)
-      if img.mode != 'RGB':
-        img = img.convert('RGB')
-      bytes = BytesIO()
-      img.save(bytes, format='JPEG')
-      return bytes.getvalue()
-    except Exception as e:
-      logger.error(f'Error loading {location}:', str(e)) 
-
+  logger.debug(f'Opening file from: {location}')
+  try:
+    img = Image.open(location)
+    if img.mode != 'RGB':
+      logger.debug(f'Converting {location} image mode: {img.mode} -> RGB')
+      img = img.convert('RGB')
+    
+    img_bytes = BytesIO()
+    img.save(img_bytes, format='JPEG')
+    return img_bytes.getvalue()
+  
+  except IOError as e:
+    raise IOError(f"Error loading {location}: {str(e)}")
+      
+  except Exception as e:
+    raise Exception(f"Unexpected error while processing {location}: {str(e)}")
 
 # write an Image to audiofile ID3 info
 def id3Image(file, art):
@@ -56,131 +70,138 @@ def id3Image(file, art):
   Returns:
       None
   """
+  tmp_file_path = None
   try:
     file['artwork'] = art
+  except KeyError as e:
+    logger.error(f"Error accessing 'artwork' in ID3 file: {str(e)}")
   except Exception as e:
     logger.error('Error setting ID3 artwork:', str(e))
     try:
-      tmp_file_path = save_image_to_tempfile(art)
-      logger.debug(f'attempting temp_image workaround: {e}')
+      logger.debug(f'Attempting temp_file workaround')
+      tmp_file_path:str = save_image_to_tempfile(art)
       if tmp_file_path:
         file['artwork'] = load_saved_image(tmp_file_path)
         logger.info('Using workaround for embedding image.')
+      else:
+        logger.error("Failed to create temporary image file for workaround.")
+    
+    except IOError as e:   
+     logger.error(f'IOError creating temp_file: {e}')
+     
     except Exception as e:
-      logger.error('Error in workaround:', str(e))
+      logger.error('Error using image temp_file workaround:', str(e))
+      
     finally:
-      if tmp_file_path and os.path.exists(tmp_file_path):
-        os.remove(tmp_file_path)
+      try:
+        if tmp_file_path and os.path.exists(tmp_file_path):
+          os.remove(tmp_file_path)
+          logger.debug(f"Cleaned up temporary image file at {tmp_file_path}")
+      except OSError as e:
+        logger.error(f"Error cleaning up temporary image file {tmp_file_path}: {str(e)}")
 
-
-def setTrackNum(file, episode, epNum):
-  """
-  Sets the track number for the given ID3 file based on the episode's metadata.
-
-  Args:
-      file (id3.ID3): The ID3 file object.
-      episode (dict): The metadata of the episode.
-      epNum (int): The fallback track number.
-
-  Returns:
-      None
-  """
+def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_image):
   try:
-    if 'itunes:episode' in episode:
-      file['tracknumber'] = episode['itunes:episode']
+    logger.info('Updating ID3 tags & encoding artwork')
+    file = id3.load_file(path)
+  except FileNotFoundError:
+    logger.error(f'Error: file {path} not found')
+    return
+  except id3.exceptions.FileFormatError:
+    logger.error(f"Error: The file format of '{path}' is not supported or the file is corrupted.")
+    return
+  except Exception as e:
+    logger.error(f"Error loading ID3 file: {str(e)}")
+    return
+
+  file['title'] = format_filename(episode['title'])
+  file['album'] = podcast_title
+  file['artist'] = podcast_title
+  file['genre'] = 'Podcast'
+  file['album artist'] = 'Various Artist'
+
+
+  # Set comment tag if 'itunes:subtitle' key exists
+  try:
+    file['comment'] = episode['itunes:subtitle']
+  except KeyError:
+    pass
+
+
+  # Set year tag
+  try:
+    pub_date = datetime.datetime.strptime(episode['pubDate'], '%a, %d %b %Y %H:%M:%S %z')
+  except (ValueError, TypeError):
+    try:
+      pub_date = datetime.datetime.strptime(episode['pubDate'], '%a, %d %b %Y %H:%M:%S %Z')
+    except (ValueError, TypeError) as e:
+      logger.error(f"Error setting year tag: {str(e)}")
+      pub_date = None
+  
+  if pub_date:
+    file['year'] = pub_date.year
+
+
+  # Set track number
+  try:
+    # return list of numbers in episode title (looking for "actual" episode number)
+    numbers_in_string:list[int] = [int(s) for s in re.findall(r'\b\d+\b', episode['title'])]
+    
+    if len(numbers_in_string) and podcast_title in get_ep_number_from_title and number_is_not_year(numbers_in_string[0]):
+      file['tracknumber'] = numbers_in_string[0]
     else:
-      file['tracknumber'] = epNum
+      try:
+        if 'itunes:episode' in episode:
+          file['tracknumber'] = episode['itunes:episode']
+        else:
+          file['tracknumber'] = epNum
+      except Exception as e:
+        logger.error(f"Error setting track number: {str(e)}")
   except Exception as e:
     logger.error(f"Error setting track number: {str(e)}")
 
 
-def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_image):
+  # Set ID3 artwork
   try:
-    file = id3.load_file(path)
-  except Exception as e:
-    logger.info(f"Error loading ID3 file: {str(e)}")
-    return
+    if 'itunes:image' in episode:
+      # If the episode metadata contains an 'itunes:image' key
+      url = episode['itunes:image']['@href']
+
+      img = requests.get(url)
+
+      logger.debug(f'itunes:image: {url}, status_code: {img.status_code}')
+
+      # Check if the image retrieval was successful
+      if img.status_code == 200 and 'content-type' in img.headers and 'image' in img.headers['content-type']:
+        try:
+          # Open the image using PIL
+          img = Image.open(BytesIO(img.content))
+
+          # Convert image to RGB mode if it's in RGBA mode
+          logger.debug(f'image mode: {img.mode}')
+          if img.mode != 'RGB':
+            img = img.convert('RGB')
+
+          bytes = BytesIO()
+          img.save(bytes, format='JPEG')
   
-  try:
-    logger.info('Updating ID3 tags & encoding artwork')
-    file['title'] = format_filename(episode['title'])
-    file['album'] = podcast_title
-    file['artist'] = podcast_title
-    file['genre'] = 'Podcast'
-    file['album artist'] = 'Various Artist'
-
-    # Set comment tag if 'itunes:subtitle' key exists
-    if 'itunes:subtitle' in episode:
-      file['comment'] = episode['itunes:subtitle']
-
-    # Set year tag
-    try:
-      pub_date = datetime.datetime.strptime(episode['pubDate'], '%a, %d %b %Y %H:%M:%S %z')
-    except (ValueError, TypeError):
-      try:
-        pub_date = datetime.datetime.strptime(episode['pubDate'], '%a, %d %b %Y %H:%M:%S %Z')
-      except (ValueError, TypeError) as e:
-        logger.error(f"Error setting year tag: {str(e)}")
-        pub_date = None
-    
-    if pub_date:
-        file['year'] = pub_date.year
-
-    # Set track number
-    try:
-      # return list of numbers in episode title (looking for "actualy" episode number)
-      ep = [int(s) for s in re.findall(r'\b\d+\b', episode['title'])]
-      if podcast_title == 'Hospital Records Podcast' and ep and ep[0] < 2000:
-        file['tracknumber'] = ep[0]
-      else:
-        setTrackNum(file, episode, epNum)
-    except Exception as e:
-      logger.error(f"Error setting track number: {str(e)}")
-
-    # Set ID3 artwork
-    try:
-      if 'itunes:image' in episode:
-        # If the episode metadata contains an 'itunes:image' key
-        url = episode['itunes:image']['@href']
-
-        img = requests.get(url)
-
-        logger.debug(f'itunes:image: {url}, status_code: {img.status_code}')
-
-        # Check if the image retrieval was successful
-        if img.status_code == 200 and 'content-type' in img.headers and 'image' in img.headers['content-type']:
-          try:
-            # Open the image using PIL
-            img = Image.open(BytesIO(img.content))
-
-            # Convert image to RGB mode if it's in RGBA mode
-            logger.debug(f'image mode: {img.mode}')
-            if img.mode != 'RGB':
-              img = img.convert('RGB')
-
-            bytes = BytesIO()
-            img.save(bytes, format='JPEG')
-   
-            # Set ID3 artwork using the retrieved image data
-            file['artwork'] = bytes.getvalue()
-          except Exception as e:
-            logger.error(f'shit happened: {e}')
-            use_fallback_image(file)
-        else:
-          # If retrieval failed, use a fallback image or previously loaded image
+          id3Image(file, bytes.getvalue())
+        except Exception as e:
+          logger.error(f'shit happened: {e}')
           use_fallback_image(file)
       else:
-        # If episode metadata does not contain 'itunes:image' key
+        # If retrieval failed, use a fallback image or previously loaded image
         use_fallback_image(file)
-          
-    except Exception as e:
-      # Handle any exceptions that occur during setting ID3 artwork
-      logger.error(f"Error setting ID3 artwork: {str(e)}")
-
-    # Save the modified ID3 tags
-    try:
-      file.save()
-    except Exception as e:
-      logger.error(f"Error saving ID3 tags: {str(e)}")
+    else:
+      # If episode metadata does not contain 'itunes:image' key
+      use_fallback_image(file)
+        
   except Exception as e:
-    logger.error(f"Error updating ID3 tags: {str(e)}")
+    # Handle any exceptions that occur during setting ID3 artwork
+    logger.error(f"Error setting ID3 artwork: {str(e)}")
+
+  # Save the modified ID3 tags
+  try:
+    file.save()
+  except Exception as e:
+    logger.error(f"Error saving ID3 tags: {str(e)}")
