@@ -69,6 +69,6 @@ if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
     echo -e "${YELLOW}Adding ${NC}${CYAN}${package}${NC}${YELLOW} command to ${NC}${GREEN}~/.bashrc${NC}"
     echo -e "$package" >> ~/.bashrc
   else
-    echo -e "${YELLOW}Line already exists in .bashrc, skipping addition.${NC}"
+    echo -e "${YELLOW}Line already exists in ${NC}${GREEN}~/.bashrc${NC}${YELLOW}, skipping addition.${NC}"
   fi
 fi
