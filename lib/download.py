@@ -28,7 +28,7 @@ def dlWithProgressBar(url: str, path: str, progress_callback=None, max_retries=3
       total_bytes = int(media.headers.get('content-length', 0))
       bytes_downloaded = 0
       start_time = round(time.time() * 1000)
-      print(path)
+      # print(path)
       progress = tqdm(total=total_bytes, unit='iB', unit_scale=True)
 
       with open(path, 'wb', buffering=chunk_size) as file:
