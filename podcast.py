@@ -74,13 +74,13 @@ class Podcast:
 
     # Validate the URL
     if not is_valid_url(self.__xmlURL):
-      logger.error(f'Invalid URL address: {self.__xmlURL}')
-      sys.exit()
+      logger.critical(f'Invalid URL address: {self.__xmlURL}')
+      return
 
     # Check if the URL is live and reachable
     if not is_live_url(self.__xmlURL):
-      logger.error(f'Error connecting to {self.__xmlURL}')
-      sys.exit()
+      logger.critical(f'Error connecting to: {self.__xmlURL}')
+      return
 
     # Log the current timestamp
     time_stamp: str = datetime.datetime.now().strftime('%a, %d %b %Y %H:%M:%S %z')
@@ -91,14 +91,14 @@ class Podcast:
     res = requests.get(self.__xmlURL, headers=headers)
     if res.status_code != 200:
       logger.critical(f'Error getting XML data. Error code {res.status_code}')
-      sys.exit()
+      return
 
     # Parse the XML content
     try:
       xml = xmltodict.parse(res.content)
     except Exception as e:
       logger.critical(f'Failed parsing XML: {e}')
-      sys.exit()
+      return
 
     # Extract podcast title and episode list from the XML
     self.__title: str = xml['rss']['channel']['title']  # Podcast title
@@ -172,26 +172,33 @@ class Podcast:
     """
     self.__coverJPG: str = os.path.join(self.__location, 'cover.jpg')
 
+    if os.path.exists(self.__coverJPG):
+      logger.debug(f'Cover exists: {self.__coverJPG}')
+      return
     # If cover art is not available, download it
-    if not os.path.exists(self.__coverJPG):
-      logger.info(f'Saving cover art {self.__coverJPG}')
-      res = requests.get(self.__imgURL, headers=headers)
-      if res.status_code == 200:
-        img = Image.open(BytesIO(res.content))
-      else:
-        logger.error("Failed to fetch image:", res.status_code)
-        return
-      logger.info(f'Image format: {img.format}, Mode: {img.mode}, Size: {img.size}')
-      width, height = img.size
-      # Resize image if too large
-      if width > 1000 or height > 1000:
-        img.thumbnail((1000, 1000), Image.LANCZOS)
-      img.convert('RGB')
-      try:
-        img.save(self.__coverJPG, 'JPEG')
-      except OSError:
-        img.save(self.__coverJPG, 'PNG')
-      self.__image = img  # Save the image for later use
+    logger.debug(f'Fetching image from: {self.__imgURL}')
+    res = requests.get(self.__imgURL, headers=headers)
+    if res.status_code == 200:
+      img = Image.open(BytesIO(res.content))
+    else:
+      logger.error("Failed to fetch image status code:", res.status_code)
+      return
+    logger.debug(f'Image format: {img.format}, Mode: {img.mode}, Size: {img.size}')
+    width, height = img.size
+    # Resize image if too large
+    if width > 1000 or height > 1000:
+      logger.debug('Resizing image to: 1000pxX1000px')
+      img.thumbnail((1000, 1000), Image.LANCZOS)
+    if img.mode != 'RGB':
+      logger.debug('Convertings image mode to: RGB')
+      img = img.convert('RGB')
+    try:
+      logger.info(f'Saving cover art to: {self.__coverJPG}')
+      img.save(self.__coverJPG, 'JPEG')
+    except OSError as e:
+      logger.error(f'Can not save cover image as JPG: {e}')
+      return
+    self.__image = img  # Save the image for later use
 
   def __mkdir(self) -> None:
     """
@@ -199,9 +206,9 @@ class Podcast:
     Also, fetches and saves the cover art for the podcast.
     """
     if not os.path.exists(self.__podcast_folder):
-      logger.error(f'Error accessing location {self.__podcast_folder}')
-      logger.error('Check if network drive is mounted')
-      sys.exit()
+      s:str = f'Error accessing location {self.__podcast_folder}, Check if drive is mounted'
+      logger.error(s)
+      raise Exception(s)
 
     if not os.path.exists(self.__location):
       logger.info(f'Creating folder {self.__location}')
@@ -281,7 +288,7 @@ class Podcast:
           shutil.rmtree(self.__location)
           logger.info(f'Deleting directory {self.__location}')
         except:
-          pass
+          logger.error(f'Failed deletion: {self.__location}')
 
   def downloadNewest(self, window) -> None:
     """
@@ -290,7 +297,12 @@ class Podcast:
     Args:
       window (object): UI window for progress updates (if applicable).
     """
-    self.__mkdir()  # Ensure the directory and cover art exist
+    try:
+      self.__mkdir()  # Ensure the directory and cover art exist
+    except Exception as e:
+      logger.error(f'Error creating directory: {e}')
+      return
+
     self.__fileDL(self.__list[0], self.episodeCount(), window)  # Download the newest episode
 
   def downloadAll(self, window) -> None:
@@ -300,7 +312,12 @@ class Podcast:
     Args:
       window (object): UI window for progress updates (if applicable).
     """
-    self.__mkdir()
+    try:
+      self.__mkdir()
+    except Exception as e:
+      logger.error(f'Error creating directory: {e}')
+      return
+
     for ndx, episode in enumerate(self.__list):
       self.__fileDL(episode, self.episodeCount() - ndx, window)
 
@@ -312,7 +329,12 @@ class Podcast:
       count (int): The number of episodes to download.
       window (object): UI window for progress updates (if applicable).
     """
-    self.__mkdir()
+    try:
+      self.__mkdir()
+    except Exception as e:
+      logger.error(f'Error creating directory: {e}')
+      return
+
     for ndx in range(count):
       self.__fileDL(self.__list[ndx], self.episodeCount() - ndx, window)
 
