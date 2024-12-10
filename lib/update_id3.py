@@ -35,7 +35,7 @@ def load_saved_image(location:str) -> bytes:
   if os.path.exists(location):
     try:
       img = Image.open(location)
-      if img.mode == 'RGBA':
+      if img.mode != 'RGB':
         img = img.convert('RGB')
       bytes = BytesIO()
       img.save(bytes, format='JPEG')
