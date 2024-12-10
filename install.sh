@@ -22,7 +22,7 @@ echo -e "${ORANGE} _____    ______   _    _   ______   _    _  10${NC}";
 echo -e "${ORANGE}| | \ \  / |  | \ | |  | | | | ____ | |  | |   ${NC}";
 echo -e "${ORANGE}| | | |  | |  | | | |  | | | |  | | | |--| |   ${NC}";
 echo -e "${ORANGE}|_|_/_/  \_|__|_/ \_|__|_| |_|__|_| |_|  |_|   ${NC}";
-echo -e "${GREY}${package}${NC}${WHITE} Envoronment Installer v${NC}${GREEN}${version}${NC}";
+echo -e "${CYAN}${package}${NC}${WHITE} Envoronment Installer v${NC}${GREEN}${version}${NC}";
 echo -e ""
 echo -e "${YELLOW}Install Dependencies${NC}"
 sudo apt-get update && sudo apt-get install git python3 python3-pip -y
@@ -59,14 +59,14 @@ chmod +x -v $package
 
 echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ~/${package}/.env${NC}${YELLOW} to configure environment.${NC}"
 
-echo -e "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n) This will run ${NC}${CYAN}podcast.py${NC}${YELLOW} when terminal is opened${NC}"
+echo -e "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n) This will run ${NC}${CYAN}${package}${NC}${YELLOW} when terminal is opened${NC}"
 read -r response
 if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
   echo -e "${YELLOW}Backing up ${NC}${GREEN}~/.bashrc${NC}${YELLOW} to ${NC}${GREEN}~/.bashrc-backup${NC}"
   cp  ~/.bashrc  ~/.bashrc-backup 
 
   if ! grep -q "$package" ~/.bashrc; then
-    echo -e "${YELLOW}Adding ${package} command to ${NC}${GREEN}~/.bashrc${NC}"
+    echo -e "${YELLOW}Adding ${NC}${CYAN}${package}${NC}${YELLOW} command to ${NC}${GREEN}~/.bashrc${NC}"
     echo -e "$package" >> ~/.bashrc
   else
     echo -e "${YELLOW}Line already exists in .bashrc, skipping addition.${NC}"
