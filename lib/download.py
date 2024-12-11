@@ -85,9 +85,9 @@ def seconds_to_readable_time(seconds: int) -> str:
     >>> seconds_to_readable_time(3661)
     '1 hour, 1 minute, 1 second'
   """
-  hours = seconds // 3600
-  minutes = (seconds % 3600) // 60
-  seconds = seconds % 60
+  hours = round(seconds // 3600)
+  minutes = round((seconds % 3600) // 60)
+  seconds = round(seconds % 60)
 
   time_str = []
   if hours > 0:
