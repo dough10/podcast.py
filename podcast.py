@@ -267,12 +267,13 @@ class Podcast:
       logger.critical(f'Error creating directory: {e}')
       return
     
-    try: 
-      self.__img = Coverart(self.__img_url)
-      self.__img.save(self.__location)
-    except Exception as e:
-      logger.critical(e)
-      return
+    if not os.path.exists(os.path.join(self.__location, 'cover.jpg')):
+      try: 
+        self.__img = Coverart(self.__img_url)
+        self.__img.save(self.__location)
+      except Exception as e:
+        logger.critical(e)
+        return
 
     self.__fileDL(self.__list[0], self.episodeCount(), window)  # Download the newest episode
 
@@ -289,12 +290,13 @@ class Podcast:
       logger.critical(f'Error creating directory: {e}')
       return
 
-    try: 
-      self.__img = Coverart(self.__img_url)
-      self.__img.save(self.__location)
-    except Exception as e:
-      logger.critical(e)
-      return
+    if not os.path.exists(os.path.join(self.__location, 'cover.jpg')):
+      try: 
+        self.__img = Coverart(self.__img_url)
+        self.__img.save(self.__location)
+      except Exception as e:
+        logger.critical(e)
+        return
 
     for ndx, episode in enumerate(self.__list):
       self.__fileDL(episode, self.episodeCount() - ndx, window)
@@ -313,12 +315,13 @@ class Podcast:
       logger.critical(f'Error creating directory: {e}')
       return
 
-    try: 
-      self.__img = Coverart(self.__img_url)
-      self.__img.save(self.__location)
-    except Exception as e:
-      logger.critical(e)
-      return
+    if not os.path.exists(os.path.join(self.__location, 'cover.jpg')):
+      try: 
+        self.__img = Coverart(self.__img_url)
+        self.__img.save(self.__location)
+      except Exception as e:
+        logger.critical(e)
+        return
 
     for ndx in range(count):
       self.__fileDL(self.__list[ndx], self.episodeCount() - ndx, window)
