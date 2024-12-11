@@ -114,11 +114,11 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
     
 
   file['title'] = format_filename(episode['title'])
-  logger.debug(f'Episode title: {file['title']}')
+  logger.debug(f'Episode title: {file["title"]}')
 
   file['album'] = podcast_title
-  logger.debug(f'Podcast title: {file['album']}')
-  
+  logger.debug(f'Podcast title: {file["album"]}')
+
   file['genre'] = 'Podcast'
   file['album artist'] = 'Various Artist'
 
