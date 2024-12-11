@@ -1,6 +1,6 @@
 import string
 
-def format_filename(s:str) -> str:
+def format_filename(name:str) -> str:
   """
   Format the given string to be a valid filename.
 
@@ -11,5 +11,5 @@ def format_filename(s:str) -> str:
   str: The formatted filename.
   """
   valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
-  filename = ''.join(c for c in s.replace('&', 'and') if c in valid_chars)
+  filename = ''.join(c for c in name.replace('&', 'and') if c in valid_chars)
   return filename  

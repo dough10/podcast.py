@@ -26,7 +26,6 @@ def number_is_not_year(num):
 
 # save a downloaded image as a temp file
 def save_image_to_tempfile(img):
-  
   try:
     with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp_file:
       if isinstance(img, bytes):
@@ -36,7 +35,7 @@ def save_image_to_tempfile(img):
       tmp_file_path = tmp_file.name
       return tmp_file_path
   except IOError as e:
-    raise IOError(f"Error creating temp_file: {str(e)}")
+    raise IOError(f"Error creating temp file: {str(e)}")
   except Exception as e:
     raise Exception(f"Error saving image to tempfile: {str(e)}")
 
@@ -87,10 +86,11 @@ def id3Image(file, art):
         logger.error("Failed to create temporary image file for workaround.")
     
     except IOError as e:   
-     logger.error(f'IOError creating temp_file: {e}')
+      raise IOError(f'IOError creating temp_file: {e}')
      
     except Exception as e:
-      logger.error('Error using image temp_file workaround:', str(e))
+      raise Exception('Error using image temp_file workaround:', str(e))
+      
       
     finally:
       try:
@@ -99,6 +99,7 @@ def id3Image(file, art):
           logger.debug(f"Cleaned up temporary image file at {tmp_file_path}")
       except OSError as e:
         logger.error(f"Error cleaning up temporary image file {tmp_file_path}: {str(e)}")
+        raise 
 
 def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_image):
   try:
@@ -106,13 +107,14 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
     file = id3.load_file(path)
   except FileNotFoundError:
     logger.error(f'Error: file {path} not found')
-    return
+    raise
+    
   except id3.exceptions.FileFormatError:
-    logger.error(f"Error: The file format of '{path}' is not supported or the file is corrupted.")
-    return
+    raise Exception(f"Error: The file format of '{path}' is not supported or the file is corrupted.")
+    
   except Exception as e:
-    logger.error(f"Error loading ID3 file: {str(e)}")
-    return
+    raise Exception(f"Error loading ID3 file: {str(e)}")
+    
 
   file['title'] = format_filename(episode['title'])
   file['album'] = podcast_title
@@ -124,20 +126,20 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
   # Set comment tag if 'itunes:subtitle' key exists
   try:
     file['comment'] = episode['itunes:subtitle']
-  except KeyError:
-    pass
+  except KeyError as e:
+    logger.error(f'Failed to set comment: {str(e)}')
 
 
   # Set year tag
+  pub_date = None
   try:
     pub_date = datetime.datetime.strptime(episode['pubDate'], '%a, %d %b %Y %H:%M:%S %z')
-  except (ValueError, TypeError):
+  except (ValueError, TypeError) as E:
     try:
       pub_date = datetime.datetime.strptime(episode['pubDate'], '%a, %d %b %Y %H:%M:%S %Z')
     except (ValueError, TypeError) as e:
-      logger.error(f"Error setting year tag: {str(e)}")
-      pub_date = None
-  
+      logger.error(f"Error setting year tag: {str(E)}, {str(e)}")
+
   if pub_date:
     file['year'] = pub_date.year
 
@@ -146,17 +148,23 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
   try:
     # return list of numbers in episode title (looking for "actual" episode number)
     numbers_in_string:list[int] = [int(s) for s in re.findall(r'\b\d+\b', episode['title'])]
-    
-    if len(numbers_in_string) and podcast_title in get_ep_number_from_title and number_is_not_year(numbers_in_string[0]):
-      file['tracknumber'] = numbers_in_string[0]
-    else:
+
+    if podcast_title in get_ep_number_from_title:
+      for num in numbers_in_string:
+        if number_is_not_year(num):
+          logger.debug(f'Using episode number from title: {num}')
+          file['tracknumber'] = num
+
+    if not file['tracknumber']:
       try:
         if 'itunes:episode' in episode:
+          logger.debug(f'Using episode number from XML: {episode['itunes:episode']}')
           file['tracknumber'] = episode['itunes:episode']
         else:
+          logger.debug(f'Using episode number from episode count: {epNum}')
           file['tracknumber'] = epNum
       except Exception as e:
-        logger.error(f"Error setting track number: {str(e)}")
+        raise Exception(e)
   except Exception as e:
     logger.error(f"Error setting track number: {str(e)}")
 
@@ -168,18 +176,19 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
       url = episode['itunes:image']['@href']
 
       img = requests.get(url)
+      img.raise_for_status()
 
       logger.debug(f'itunes:image: {url}, status_code: {img.status_code}')
 
       # Check if the image retrieval was successful
-      if img.status_code == 200 and 'content-type' in img.headers and 'image' in img.headers['content-type']:
+      if 'content-type' in img.headers and 'image' in img.headers['content-type']:
         try:
           # Open the image using PIL
           img = Image.open(BytesIO(img.content))
 
           # Convert image to RGB mode if it's in RGBA mode
-          logger.debug(f'image mode: {img.mode}')
           if img.mode != 'RGB':
+            logger.debug(f'Cnverting image mode: {img.mode} -> RGB')
             img = img.convert('RGB')
 
           bytes = BytesIO()
@@ -187,7 +196,7 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
   
           id3Image(file, bytes.getvalue())
         except Exception as e:
-          logger.error(f'shit happened: {e}')
+          logger.error(f'Failed setting image from {url}: {e}')
           use_fallback_image(file)
       else:
         # If retrieval failed, use a fallback image or previously loaded image
@@ -198,10 +207,10 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
         
   except Exception as e:
     # Handle any exceptions that occur during setting ID3 artwork
-    logger.error(f"Error setting ID3 artwork: {str(e)}")
+    raise Exception(f"Error setting ID3 artwork: {str(e)}")
 
   # Save the modified ID3 tags
   try:
     file.save()
   except Exception as e:
-    logger.error(f"Error saving ID3 tags: {str(e)}")
+    raise Exception(f"Error saving ID3 tags: {str(e)}")

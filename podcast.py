@@ -161,10 +161,16 @@ class Podcast:
 
     logger.info(f'Downloading - {stats["filename"]}')
     # Download the episode with progress reporting
-    dl_with_progress_bar(stats['url'], path, progress_callback=prog_update)
+    try:
+      dl_with_progress_bar(stats['url'], path, progress_callback=prog_update)
+    except Exception as e:
+      logger.error(f'Failed to download file: {str(e)}')
 
     # Apply ID3 tags to the downloaded file
-    update_ID3(self.__title, episode, path, epNum, self.fallback_image)
+    try:
+      update_ID3(self.__title, episode, path, epNum, self.fallback_image)
+    except Exception as e:
+      logger.error(f'Failed setting ID3 info: {str(e)}')
 
   def __get_cover_art(self) -> None:
     """
