@@ -123,11 +123,10 @@ class Podcast:
       file (str): Path to the downloaded podcast file.
     """
     logger.info('Using fallback image')
-    if hasattr(self, '__image'):
-      id3Image(file, self.__image)  # Update the ID3 tags with the image
+    if hasattr(self, '__img'):
+      id3Image(file, self.__img.bytes())
     else:
-      self.__image = load_saved_image(self.__cover_jpg)  # Load a saved image if available
-      id3Image(file, self.__image)  # Update the ID3 tags with the image
+      id3Image(file, load_saved_image(os.path.join(self.__location, 'cover.jpg')))
 
   def __fileDL(self, episode, epNum, window) -> None:
     """

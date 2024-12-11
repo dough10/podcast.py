@@ -59,6 +59,7 @@ class Coverart:
   def bytes(self) -> bytes:
     bytes = BytesIO()
     self.__img.save(bytes, format='JPEG')
+    logger.debug('Generating image bytes')
     return bytes.getvalue()
   
   # def get_image(self):
