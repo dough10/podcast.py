@@ -208,7 +208,7 @@ class Podcast:
       except Exception as e:
         raise Exception(e)
     else:
-      logger.info(f'{cover_loc} exists.')
+      logger.debug(f'{cover_loc} exists.')
 
   def episodeCount(self) -> int:
     """
