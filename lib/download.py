@@ -15,6 +15,33 @@ class DownloadError(Exception):
   """Custom exception for download errors"""
   pass
 
+def bytes_to_readable_rate(rate: float) -> str:
+  """
+  Converts a download rate in bytes per second to a human-readable format (KB/s, MB/s, GB/s).
+
+  Args:
+    rate (float): The download rate in bytes per second.
+
+  Returns:
+    str: A formatted string representing the download rate in a readable format.
+  
+  Example:
+    >>> bytes_to_readable_rate(1048576)
+    '1.00 MB/s'
+  """
+  # Define the size thresholds and their corresponding units
+  units = ['B/s', 'KB/s', 'MB/s', 'GB/s', 'TB/s']
+  unit_index = 0
+  
+  # Loop to find the appropriate unit for the rate
+  while rate >= 1024 and unit_index < len(units) - 1:
+    rate /= 1024.0
+    unit_index += 1
+
+  # Format the rate to two decimal places and append the unit
+  return f"{rate:.2f} {units[unit_index]}"
+
+
 def seconds_to_readable_time(seconds: int) -> str:
   """
   Converts time from seconds to a human-readable format (hours, minutes, and seconds).
@@ -80,9 +107,10 @@ def dl_with_progress_bar(url: str, path: str, progress_callback=None, max_retrie
       # Open the file and write chunks of data to it
       with open(path, 'wb', buffering=chunk_size) as file:
         for data in media.iter_content(chunk_size):
-          bytes_downloaded += len(data)  # Update the number of bytes downloaded
+          chunk_length = len(data)
+          bytes_downloaded += chunk_length  # Update the number of bytes downloaded
           file.write(data)  # Write the chunk to the file
-          progress.update(len(data))  # Update the progress bar
+          progress.update(chunk_length)  # Update the progress bar
           
           # Call the progress callback, if provided
           if progress_callback:
@@ -96,7 +124,7 @@ def dl_with_progress_bar(url: str, path: str, progress_callback=None, max_retrie
         download_rate = total_bytes / elapsed_time / 1024  # Rate in KB/s
         logger.info(f"Download completed: {total_bytes / (1024 * 1024):.2f} MB downloaded. "
                     f"Elapsed time: {seconds_to_readable_time(elapsed_time)}. "
-                    f"Average download rate: {download_rate:.2f} KB/s.")
+                    f"Average download rate: {bytes_to_readable_rate(download_rate)}.")
 
       # Check if the downloaded bytes match the expected total
       if bytes_downloaded != total_bytes:
