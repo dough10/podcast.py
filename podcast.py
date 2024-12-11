@@ -101,8 +101,6 @@ class Podcast:
     self.__list: list[dict] = xml['rss']['channel']['item']  # List of episodes
     self.__location: str = os.path.join(self.__podcast_folder, format_filename(self.__title))  # Folder path for the podcast
 
-    logger.debug(self.__list)
-
     # Extract cover image URL (handle different XML structures)
     try:
       self.__img_url: str = xml['rss']['channel']['image']['url']
