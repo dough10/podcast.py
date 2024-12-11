@@ -131,7 +131,7 @@ def dl_with_progress_bar(url: str, path: str, progress_callback=None, max_retrie
       start_time = round(time.time() * 1000)  # Record the start time in milliseconds
 
       # Create a progress bar for the download
-      progress = tqdm(total=total_bytes, unit='iB', unit_scale=True)
+      progress = tqdm(total=total_bytes, unit='B', unit_scale=True)
 
       # Open the file and write chunks of data to it
       with open(path, 'wb', buffering=chunk_size) as file:
