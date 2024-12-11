@@ -54,7 +54,6 @@ class Coverart:
     self.__cover_path = os.path.join(path, 'cover.jpg')
 
     if os.path.exists(self.__cover_path):
-      logger.debug(f'{self.__cover_path} exists')
       return
 
     try:
@@ -64,7 +63,7 @@ class Coverart:
       raise Exception(f'Can not save cover image as JPG: {e}')
     
   def bytes(self) -> bytes:
+    logger.debug('Generating image bytes')
     bytes = BytesIO()
     self.__img.save(bytes, format='JPEG')
-    logger.debug('Generating image bytes')
     return bytes.getvalue()
