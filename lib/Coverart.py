@@ -42,7 +42,6 @@ class Coverart:
     except Exception as e:
       raise DownloadError(f'Unexpected error: {e}')
   
-
   def save(self, path:str) -> None:
     self.__cover_path = os.path.join(path, 'cover.jpg')
 
@@ -61,6 +60,3 @@ class Coverart:
     self.__img.save(bytes, format='JPEG')
     logger.debug('Generating image bytes')
     return bytes.getvalue()
-  
-  # def get_image(self):
-  #   return self.__img

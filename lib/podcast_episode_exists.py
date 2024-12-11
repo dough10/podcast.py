@@ -44,12 +44,15 @@ def podcast_episode_exists(podcast_title: str, episode: dict) -> dict:
   # Get the folder path where podcasts are stored, from environment variables
   folder: str = os.getenv('podcast_folder')
   
-  # Extract the download URL from the episode metadata
-  download_url: str = episode['enclosure']['@url']
+  try:
+    # Extract the download URL from the episode metadata
+    download_url: str = episode['enclosure']['@url']
+  except KeyError as e:
+    raise Exception(f'Failed getting an episode url from provided data: {e}')
   
   # Extract the file extension from the URL (e.g., .mp3, .m4a)
   file_ext: str = os.path.splitext(urlparse(download_url).path)[-1]
-  
+
   try:
     # Try to format the filename using season and episode information
     filename: str = format_filename(f"S{episode['itunes:season']}.E{episode['itunes:episode']}.{episode['title']}{file_ext}")

@@ -25,7 +25,6 @@ def get_ep_number_from_title():
 def number_is_not_year(num):
   return num < 2000
 
-# save a downloaded image as a temp file
 def save_image_to_tempfile(img):
   try:
     with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp_file:
@@ -59,16 +58,16 @@ def load_saved_image(location:str) -> bytes:
     raise Exception(f"Unexpected error while processing {location}: {str(e)}")
 
 # write an Image to audiofile ID3 info
-def id3Image(file, art):
+def id3Image(file:dict, art:bytes):
   """
   Sets the ID3 artwork for the given file using the provided image data.
 
   Args:
-      file (id3.ID3): The ID3 file object.
-      img (bytes): The image data.
+    file (id3.ID3): The ID3 file object.
+    img (bytes): The image data.
 
   Returns:
-      None
+    None
   """
   tmp_file_path = None
   try:

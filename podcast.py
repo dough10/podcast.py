@@ -110,6 +110,7 @@ class Podcast:
       self.__img_url: str = xml['rss']['channel']['itunes:image']['@href']
     except Exception as e:
       logger.critical(f'Failed finding image url: {e}')
+      return
 
     ep_count = self.episodeCount()
     logger.info(f'{self.__title}: {str(ep_count)} episodes')
@@ -137,7 +138,11 @@ class Podcast:
       epNum (int): The episode number.
       window (object): UI window for progress updates (if applicable).
     """
-    stats = podcast_episode_exists(self.__title, episode)
+    try:
+      stats = podcast_episode_exists(self.__title, episode)
+    except Exception as e:
+      logger.critical(f'Failed chacking episode status: {e}')
+      return
 
     # Check if the episode has already been downloaded
     if stats['exists']:
@@ -183,6 +188,17 @@ class Podcast:
         os.makedirs(self.__location)
       except OSError as e:
         raise OSError(f"Error creating folder {self.__location}: {str(e)}")
+
+  def __get_cover(self):
+    cover_loc = os.path.join(self.__location, 'cover.jpg')
+    if not os.path.exists(cover_loc):
+      try: 
+        self.__img = Coverart(self.__img_url)
+        self.__img.save(self.__location)
+      except Exception as e:
+        raise Exception(e)
+    else:
+      logger.info(f'{cover_loc} exists.')
 
   def episodeCount(self) -> int:
     """
@@ -266,14 +282,12 @@ class Podcast:
     except Exception as e:
       logger.critical(f'Error creating directory: {e}')
       return
-    
-    if not os.path.exists(os.path.join(self.__location, 'cover.jpg')):
-      try: 
-        self.__img = Coverart(self.__img_url)
-        self.__img.save(self.__location)
-      except Exception as e:
-        logger.critical(e)
-        return
+
+    try:
+      self.__get_cover()
+    except Exception as e:
+      logger.critical(f'Failed getting cover.jpg: {e}')
+      return
 
     self.__fileDL(self.__list[0], self.episodeCount(), window)  # Download the newest episode
 
@@ -290,13 +304,11 @@ class Podcast:
       logger.critical(f'Error creating directory: {e}')
       return
 
-    if not os.path.exists(os.path.join(self.__location, 'cover.jpg')):
-      try: 
-        self.__img = Coverart(self.__img_url)
-        self.__img.save(self.__location)
-      except Exception as e:
-        logger.critical(e)
-        return
+    try:
+      self.__get_cover()
+    except Exception as e:
+      logger.critical(f'Failed getting cover.jpg: {e}')
+      return
 
     for ndx, episode in enumerate(self.__list):
       self.__fileDL(episode, self.episodeCount() - ndx, window)
@@ -315,13 +327,11 @@ class Podcast:
       logger.critical(f'Error creating directory: {e}')
       return
 
-    if not os.path.exists(os.path.join(self.__location, 'cover.jpg')):
-      try: 
-        self.__img = Coverart(self.__img_url)
-        self.__img.save(self.__location)
-      except Exception as e:
-        logger.critical(e)
-        return
+    try:
+      self.__get_cover()
+    except Exception as e:
+      logger.critical(f'Failed getting cover.jpg: {e}')
+      return
 
     for ndx in range(count):
       self.__fileDL(self.__list[ndx], self.episodeCount() - ndx, window)
