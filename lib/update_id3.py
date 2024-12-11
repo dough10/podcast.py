@@ -18,7 +18,8 @@ logger = Logs().get_logger()
 
 
 get_ep_number_from_title = [
-  'Hospital Records Podcast'
+  'Hospital Records Podcast',
+  'Deeper Shades of House - weekly Deep House Podcast with Lars Behrenroth'
 ]
 
 def number_is_not_year(num):
