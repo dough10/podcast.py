@@ -23,7 +23,7 @@ class Coverart:
       response.raise_for_status()
 
       if not 'content-type' in response.headers and not 'image' in response.headers['content-type']:
-        raise Exception(f'Not valid image content-type: {self.__img.headers['content-type']}')
+        raise Exception(f'Not valid image content-type: {self.__img.headers["content-type"]}')
 
       self.__img = Image.open(BytesIO(response.content))
 
