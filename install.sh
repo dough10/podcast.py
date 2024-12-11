@@ -4,7 +4,7 @@ set -e
 
 package='podcast.py'
 
-version=0.1
+version=0.3
 
 BLACK='\033[0;30m'
 RED='\033[0;31m'
@@ -22,7 +22,7 @@ echo -e "${ORANGE} _____    ______   _    _   ______   _    _  10${NC}";
 echo -e "${ORANGE}| | \ \  / |  | \ | |  | | | | ____ | |  | |   ${NC}";
 echo -e "${ORANGE}| | | |  | |  | | | |  | | | |  | | | |--| |   ${NC}";
 echo -e "${ORANGE}|_|_/_/  \_|__|_/ \_|__|_| |_|__|_| |_|  |_|   ${NC}";
-echo -e "${CYAN}${package}${NC}${WHITE} Envoronment Installer v${NC}${GREEN}${version}${NC}";
+echo -e "${CYAN}${package}${NC}${WHITE} v${NC}${GREEN}${version}${NC}${WHITE} Envoronment Installer${NC}";
 echo -e ""
 echo -e "${YELLOW}Install Dependencies${NC}"
 sudo apt-get update && sudo apt-get install git python3 python3-pip -y
