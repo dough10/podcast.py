@@ -4,19 +4,17 @@ import os
 import sys
 import shutil
 import requests
-import datetime
 import xmltodict
-from PIL import Image
-from io import BytesIO
 from dotenv import load_dotenv, set_key
 
 # Importing various helper functions and modules
+from lib.Coverart import Coverart
 from lib.question import question
 from lib.format_filename import format_filename
 from lib.headers import headers
 from lib.update_id3 import update_ID3, id3Image, load_saved_image
 from lib.logs import Logs
-from lib.download import dl_with_progress_bar
+from lib.download import dl_with_progress_bar, DownloadError
 from lib.podcast_episode_exists import podcast_episode_exists
 from lib.is_live_url import is_live_url, is_connected, is_valid_url
 
@@ -172,46 +170,6 @@ class Podcast:
     except Exception as e:
       logger.error(f'Failed setting ID3 info: {str(e)}')
 
-  def __get_cover_art(self) -> None:
-    """
-    Downloads and saves the podcast cover art if it is not already saved.
-    The cover art is saved as 'cover.jpg' in the podcast's folder.
-    """
-    self.__cover_jpg: str = os.path.join(self.__location, 'cover.jpg')
-
-    if os.path.exists(self.__cover_jpg):
-      logger.debug(f'Cover exists: {self.__cover_jpg}')
-      return
-    # If cover art is not available, download it
-    try:
-      logger.debug(f'Fetching image from: {self.__img_url}')
-      res = requests.get(self.__img_url, headers=headers)
-      res.raise_for_status()
-    except requests.exceptions.RequestException as e:
-      logger.critical(f'Error getting image data from {self.__img_url}: {e}')
-      return
-    except Exception as e:
-      logger.critical(f'Unexpected error: {e}')
-      return
-          
-    img = Image.open(BytesIO(res.content))
-    logger.debug(f'Image format: {img.format}, Mode: {img.mode}, Size: {img.size}')
-    width, height = img.size
-    # Resize image if too large
-    if width > 1000 or height > 1000:
-      logger.debug(f'Resizing image: {width}px X {height}px -> 1000px X 1000px')
-      img.thumbnail((1000, 1000), Image.LANCZOS)
-    if img.mode != 'RGB':
-      logger.debug(f'Convertings image mode: {img.mode} -> RGB')
-      img = img.convert('RGB')
-    try:
-      logger.info(f'Saving cover art to: {self.__cover_jpg}')
-      img.save(self.__cover_jpg, 'JPEG')
-    except OSError as e:
-      logger.error(f'Can not save cover image as JPG: {e}')
-      return
-    self.__image = img  # Save the image for later use
-
   def __mkdir(self) -> None:
     """
     Creates the directory for the podcast if it doesn't exist.
@@ -223,14 +181,11 @@ class Podcast:
       raise Exception(error_str)
 
     if not os.path.exists(self.__location):
-      logger.info(f'Creating folder {self.__location}')
+      logger.debug(f'Creating folder {self.__location}')
       try:
         os.makedirs(self.__location)
       except OSError as e:
         raise OSError(f"Error creating folder {self.__location}: {str(e)}")
-
-    # Fetch cover art for the podcast
-    self.__get_cover_art()
 
   def episodeCount(self) -> int:
     """
@@ -314,6 +269,13 @@ class Podcast:
     except Exception as e:
       logger.error(f'Error creating directory: {e}')
       return
+    
+    try: 
+      art = Coverart(self.__img_url)
+      art.save(self.__location)
+    except Exception as e:
+      logger.critical(e)
+      return
 
     self.__fileDL(self.__list[0], self.episodeCount(), window)  # Download the newest episode
 
@@ -328,6 +290,13 @@ class Podcast:
       self.__mkdir()
     except Exception as e:
       logger.error(f'Error creating directory: {e}')
+      return
+
+    try: 
+      art = Coverart(self.__img_url)
+      art.save(self.__location)
+    except Exception as e:
+      logger.critical(e)
       return
 
     for ndx, episode in enumerate(self.__list):
@@ -345,6 +314,13 @@ class Podcast:
       self.__mkdir()
     except Exception as e:
       logger.error(f'Error creating directory: {e}')
+      return
+
+    try: 
+      art = Coverart(self.__img_url)
+      art.save(self.__location)
+    except Exception as e:
+      logger.critical(e)
       return
 
     for ndx in range(count):
