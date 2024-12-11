@@ -207,8 +207,6 @@ class Podcast:
         self.__img.save(self.__location)
       except Exception as e:
         raise Exception(e)
-    else:
-      logger.debug(f'{cover_loc} exists.')
 
   def episodeCount(self) -> int:
     """
