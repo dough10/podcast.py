@@ -354,7 +354,6 @@ if __name__ == "__main__":
       sub = ['subscribe', 'sub', 's']
       unsub = ['unsubscribe', 'unsub', 'u']
 
-      # Prompt for user action if needed
       while True:
         answer = action if action != '' else input("Please choose: subscribe or unsubscribe: ")
         if answer.lower() in sub:
@@ -369,7 +368,7 @@ if __name__ == "__main__":
       raise IndexError("Updating podcasts.")
   except IndexError as e:
     try:
-      # Download newest episodes for all subscriptions
+
       for url in subscriptions():
         Podcast(url).downloadNewest(False)
     except Exception as e:
