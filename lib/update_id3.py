@@ -40,11 +40,11 @@ def save_image_to_tempfile(img):
     raise Exception(f"Error saving image to tempfile: {str(e)}")
 
 def load_saved_image(location:str) -> bytes:
-  logger.debug(f'Opening file from: {location}')
+  logger.debug(f'Loading image from: {location}')
   try:
     img = Image.open(location)
     if img.mode != 'RGB':
-      logger.debug(f'Converting {location} image mode: {img.mode} -> RGB')
+      logger.debug(f'Converting image mode: {img.mode} -> RGB')
       img = img.convert('RGB')
     
     img_bytes = BytesIO()
@@ -114,8 +114,11 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
     
 
   file['title'] = format_filename(episode['title'])
+  logger.debug(f'Episode title: {file['title']}')
+
   file['album'] = podcast_title
-  file['artist'] = podcast_title
+  logger.debug(f'Podcast title: {file['album']}')
+  
   file['genre'] = 'Podcast'
   file['album artist'] = 'Various Artist'
 
@@ -139,6 +142,7 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
 
   if pub_date:
     file['year'] = pub_date.year
+    logger.debug(f'year: {file['year']}')
 
 
   # Set track number
@@ -146,19 +150,20 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
     # return list of numbers in episode title (looking for "actual" episode number)
     numbers_in_string:list[int] = [int(s) for s in re.findall(r'\b\d+\b', episode['title'])]
 
+    # logger.debug(f'{len(numbers_in_string)} numbers in title')
     if podcast_title in get_ep_number_from_title():
       for num in numbers_in_string:
         if number_is_not_year(num):
-          logger.debug(f'Using episode number from title: {num}')
+          logger.debug(f'Episode number: {num}')
           file['tracknumber'] = num
 
     if not file['tracknumber']:
       try:
         if 'itunes:episode' in episode:
-          logger.debug(f'Using episode number from XML: {episode["itunes:episode"]}')
+          logger.debug(f'Episode number: {episode["itunes:episode"]}')
           file['tracknumber'] = episode['itunes:episode']
         else:
-          logger.debug(f'Using episode number from episode count: {epNum}')
+          logger.debug(f'Episode number: {epNum}')
           file['tracknumber'] = epNum
       except Exception as e:
         raise Exception(e)
