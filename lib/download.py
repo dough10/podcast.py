@@ -15,6 +15,35 @@ class DownloadError(Exception):
   """Custom exception for download errors"""
   pass
 
+def bytes_to_readable_size(bytes: int) -> str:
+  """
+  Converts the given size in bytes to a human-readable format (KB, MB, GB, etc.).
+
+  Args:
+    bytes (int): The size in bytes to convert.
+
+  Returns:
+    str: A formatted string representing the size in a readable format (KB, MB, GB, etc.).
+  
+  Example:
+    >>> bytes_to_readable_size(1048576)
+    '1.00 MB'
+  """
+  # Define the size thresholds and their corresponding units
+  units = ['B', 'KB', 'MB', 'GB', 'TB']
+  
+  # Start with bytes and find the appropriate unit
+  unit_index = 0
+  size = bytes
+  
+  while size >= 1024 and unit_index < len(units) - 1:
+    size /= 1024.0
+    unit_index += 1
+
+  # Format the size to two decimal places and append the unit
+  return f"{size:.2f} {units[unit_index]}"
+
+
 def bytes_to_readable_rate(rate: float) -> str:
   """
   Converts a download rate in bytes per second to a human-readable format (KB/s, MB/s, GB/s).
@@ -122,7 +151,7 @@ def dl_with_progress_bar(url: str, path: str, progress_callback=None, max_retrie
       if total_bytes > 0:
         elapsed_time = (round(time.time() * 1000) - start_time) / 1000  # Time in seconds
         download_rate = total_bytes / elapsed_time
-        logger.info(f"Download completed: {total_bytes / (1024 * 1024):.2f} MB downloaded. "
+        logger.info(f"Download completed: {bytes_to_readable_size(total_bytes)} MB downloaded. "
                     f"Elapsed time: {seconds_to_readable_time(elapsed_time)}. "
                     f"Average download rate: {bytes_to_readable_rate(download_rate)}.")
 
