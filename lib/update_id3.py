@@ -18,7 +18,7 @@ except ModuleNotFoundError:
 
 logger = Logs().get_logger()
 
-def get_ep_number_from_title():
+def get_ep_number_from_title() -> list[str]:
   env_list = os.getenv('epnum_from_title', '')
   return env_list.split(',') if env_list else []
 
