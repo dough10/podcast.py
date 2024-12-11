@@ -30,7 +30,7 @@ def bytes_to_readable_rate(rate: float) -> str:
     '1.00 MB/s'
   """
   # Define the size thresholds and their corresponding units
-  units = ['B/s', 'KB/s', 'MB/s', 'GB/s', 'TB/s']
+  units = ['KB/s', 'MB/s', 'GB/s', 'TB/s']
   unit_index = 0
   
   # Loop to find the appropriate unit for the rate
