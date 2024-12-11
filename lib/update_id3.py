@@ -176,6 +176,7 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
         id3Image(file, img.bytes())
       except Exception as e:
         logger.error(f'Error setting artwork: {e}')
+        use_fallback_image(file)
     else:
       # If episode metadata does not contain 'itunes:image' key
       use_fallback_image(file)
