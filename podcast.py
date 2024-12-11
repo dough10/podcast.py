@@ -12,7 +12,7 @@ from lib.Coverart import Coverart
 from lib.question import question
 from lib.format_filename import format_filename
 from lib.headers import headers
-from lib.update_id3 import update_ID3, id3Image, load_saved_image
+from lib.update_id3 import update_ID3, id3Image
 from lib.logs import Logs
 from lib.download import dl_with_progress_bar, DownloadError
 from lib.podcast_episode_exists import podcast_episode_exists
