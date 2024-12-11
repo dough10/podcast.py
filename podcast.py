@@ -127,7 +127,10 @@ class Podcast:
     if hasattr(self, '__img'):
       id3Image(file, self.__img.bytes())
     else:
-      id3Image(file, load_saved_image(os.path.join(self.__location, 'cover.jpg')))
+      try:
+        id3Image(file, Coverart(location=os.path.join(self.__location, 'cover.jpg')))
+      except Exception as e:
+        logger.error(f'Failed to load art from file: {e}')
 
   def __fileDL(self, episode, epNum, window) -> None:
     """
@@ -175,6 +178,8 @@ class Podcast:
     except Exception as e:
       logger.error(f'Failed setting ID3 info: {str(e)}')
 
+    logger.info('Download complete')
+
   def __mkdir(self) -> None:
     """
     Creates the directory for the podcast if it doesn't exist.
@@ -194,7 +199,7 @@ class Podcast:
     cover_loc = os.path.join(self.__location, 'cover.jpg')
     if not os.path.exists(cover_loc):
       try: 
-        self.__img = Coverart(self.__img_url)
+        self.__img = Coverart(url=self.__img_url)
         self.__img.save(self.__location)
       except Exception as e:
         raise Exception(e)
@@ -358,8 +363,10 @@ if __name__ == "__main__":
         else:
           print('Invalid option. Please enter subscribe or unsubscribe.')
     else:
-      raise IndexError("Updating podcasts.")
-  except IndexError as e:
+      raise IndexError()
+    
+    
+  except IndexError:
     try:
 
       for url in subscriptions():

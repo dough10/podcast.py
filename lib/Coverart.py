@@ -16,16 +16,24 @@ logger = Logs().get_logger()
 
 class Coverart:
 
-  def __init__(self, url:str) -> None:
+  def __init__(self, url:str = '' , location:str = '') -> None:
     try:
-      logger.debug(f'Downloading: {url}')
-      response = requests.get(url, headers=headers)
-      response.raise_for_status()
+      if url:
+        logger.debug(f'Downloading: {url}')
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
 
-      if not 'content-type' in response.headers and not 'image' in response.headers['content-type']:
-        raise Exception(f'Not valid image content-type: {self.__img.headers["content-type"]}')
+        if not 'content-type' in response.headers and not 'image' in response.headers['content-type']:
+          raise Exception(f'Not valid image content-type: {self.__img.headers["content-type"]}')
 
-      self.__img = Image.open(BytesIO(response.content))
+        self.__img = Image.open(BytesIO(response.content))
+
+      elif location:
+        logger.debug(f'Loading image from: {location}')
+        self.__img = Image.open(location)
+      
+      else: 
+        raise Exception('No content provided')
 
       width, height = self.__img.size
 

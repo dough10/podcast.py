@@ -25,37 +25,17 @@ def get_ep_number_from_title():
 def number_is_not_year(num):
   return num < 2000
 
-def save_image_to_tempfile(img):
+def save_image_to_tempfile(img:bytes):
   try:
     with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp_file:
-      if isinstance(img, bytes):
-        tmp_file.write(img)
-      else:
-        img.save(tmp_file, format='JPEG')
-      tmp_file_path = tmp_file.name
-      return tmp_file_path
+      tmp_file.write(img)
+
+    tmp_file_path = tmp_file.name
+    return tmp_file_path
   except IOError as e:
     raise IOError(f"Error creating temp file: {str(e)}")
   except Exception as e:
     raise Exception(f"Error saving image to tempfile: {str(e)}")
-
-def load_saved_image(location:str) -> bytes:
-  logger.debug(f'Loading image from: {location}')
-  try:
-    img = Image.open(location)
-    if img.mode != 'RGB':
-      logger.debug(f'Converting image mode: {img.mode} -> RGB')
-      img = img.convert('RGB')
-    
-    img_bytes = BytesIO()
-    img.save(img_bytes, format='JPEG')
-    return img_bytes.getvalue()
-  
-  except IOError as e:
-    raise IOError(f"Error loading {location}: {str(e)}")
-      
-  except Exception as e:
-    raise Exception(f"Unexpected error while processing {location}: {str(e)}")
 
 # write an Image to audiofile ID3 info
 def id3Image(file:dict, art:bytes):
@@ -77,8 +57,12 @@ def id3Image(file:dict, art:bytes):
       logger.debug(f'Attempting temp_file workaround')
       tmp_file_path:str = save_image_to_tempfile(art)
       if tmp_file_path:
-        file['artwork'] = load_saved_image(tmp_file_path)
-        logger.debug('Using workaround for embedding image.')
+        try:
+          img = Coverart(location=tmp_file_path)
+          file['artwork'] = img.bytes()
+          logger.debug('Using workaround for embedding image.')
+        except Exception as e:
+          logger.error(f'Failed to load art from file: {e}')
       else:
         logger.error("Failed to create temporary image file for workaround.")
     
@@ -102,9 +86,9 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
   try:
     logger.info('Updating ID3 tags & encoding artwork')
     file = id3.load_file(path)
+
   except FileNotFoundError:
-    logger.error(f'Error: file {path} not found')
-    raise
+    raise Exception(f'Error: file {path} not found')
     
   except id3.exceptions.FileFormatError:
     raise Exception(f"Error: The file format of '{path}' is not supported or the file is corrupted.")
@@ -126,8 +110,8 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
   # Set comment tag if 'itunes:subtitle' key exists
   try:
     file['comment'] = episode['itunes:subtitle']
-  except KeyError as e:
-    logger.error(f'Failed to set comment: {str(e)}')
+  except KeyError:
+    pass
 
 
   # Set year tag
@@ -141,8 +125,11 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
       logger.error(f"Error setting year tag: {str(E)}, {str(e)}")
 
   if pub_date:
-    file['year'] = pub_date.year
-    logger.debug(f'year: {file["year"]}')
+    try:
+      file['year'] = pub_date.year
+      logger.debug(f'year: {file["year"]}')
+    except Exception as e:
+      logger.error(f'Failed setting year: {e}')
 
 
   # Set track number
@@ -176,13 +163,12 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
     if 'itunes:image' in episode:
       # If the episode metadata contains an 'itunes:image' key
       try:
-        img = Coverart(episode['itunes:image']['@href'])
+        img = Coverart(url=episode['itunes:image']['@href'])
         id3Image(file, img.bytes())
       except Exception as e:
-        logger.error(f'Error setting artwork: {e}')
+        logger.error(f'Error setting itunes:image artwork: {e}')
         use_fallback_image(file)
     else:
-      # If episode metadata does not contain 'itunes:image' key
       use_fallback_image(file)
         
   except Exception as e:
