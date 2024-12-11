@@ -141,7 +141,8 @@ class Podcast:
     try:
       stats = podcast_episode_exists(self.__title, episode)
     except Exception as e:
-      logger.critical(f'Failed chacking episode status: {e}')
+      logger.debug(episode)
+      logger.critical(f'Failed checking episode status: {e}')
       return
 
     # Check if the episode has already been downloaded
