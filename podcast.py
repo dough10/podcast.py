@@ -16,7 +16,7 @@ from lib.format_filename import format_filename
 from lib.headers import headers
 from lib.update_id3 import update_ID3, id3Image, load_saved_image
 from lib.logs import Logs
-from lib.download import dlWithProgressBar
+from lib.download import dl_with_progress_bar
 from lib.podcast_episode_exists import podcast_episode_exists
 from lib.is_live_url import is_live_url, is_connected, is_valid_url
 
@@ -161,7 +161,7 @@ class Podcast:
 
     logger.info(f'Downloading - {stats["filename"]}')
     # Download the episode with progress reporting
-    dlWithProgressBar(stats['url'], path, progress_callback=prog_update)
+    dl_with_progress_bar(stats['url'], path, progress_callback=prog_update)
 
     # Apply ID3 tags to the downloaded file
     update_ID3(self.__title, episode, path, epNum, self.fallback_image)
