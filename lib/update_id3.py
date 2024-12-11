@@ -157,7 +157,7 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
     if not file['tracknumber']:
       try:
         if 'itunes:episode' in episode:
-          logger.debug(f'Using episode number from XML: {episode['itunes:episode']}')
+          logger.debug(f'Using episode number from XML: {episode["itunes:episode"]}')
           file['tracknumber'] = episode['itunes:episode']
         else:
           logger.debug(f'Using episode number from episode count: {epNum}')
