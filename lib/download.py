@@ -30,7 +30,7 @@ def bytes_to_readable_rate(rate: float) -> str:
     '1.00 MB/s'
   """
   # Define the size thresholds and their corresponding units
-  units = ['KB/s', 'MB/s', 'GB/s', 'TB/s']
+  units = ['B/s', 'KB/s', 'MB/s', 'GB/s', 'TB/s']
   unit_index = 0
   
   # Loop to find the appropriate unit for the rate
@@ -121,7 +121,7 @@ def dl_with_progress_bar(url: str, path: str, progress_callback=None, max_retrie
       # Log total size and download rate after closing the progress bar
       if total_bytes > 0:
         elapsed_time = (round(time.time() * 1000) - start_time) / 1000  # Time in seconds
-        download_rate = total_bytes / elapsed_time / 1024  # Rate in KB/s
+        download_rate = total_bytes / elapsed_time
         logger.info(f"Download completed: {total_bytes / (1024 * 1024):.2f} MB downloaded. "
                     f"Elapsed time: {seconds_to_readable_time(elapsed_time)}. "
                     f"Average download rate: {bytes_to_readable_rate(download_rate)}.")
