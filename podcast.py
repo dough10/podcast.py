@@ -101,6 +101,8 @@ class Podcast:
     self.__list: list[dict] = xml['rss']['channel']['item']  # List of episodes
     self.__location: str = os.path.join(self.__podcast_folder, format_filename(self.__title))  # Folder path for the podcast
 
+    logger.debug(self.__list)
+
     # Extract cover image URL (handle different XML structures)
     try:
       self.__img_url: str = xml['rss']['channel']['image']['url']
@@ -115,7 +117,7 @@ class Podcast:
     ep_count = self.episodeCount()
     logger.info(f'{self.__title}: {str(ep_count)} episodes')
 
-  def fallback_image(self, file) -> None:
+  def __fallback_image(self, file) -> None:
     """
     Handles the fallback image (in case the main cover art is not available) 
     and sets it as the ID3 image for the podcast file.
@@ -170,7 +172,7 @@ class Podcast:
 
     # Apply ID3 tags to the downloaded file
     try:
-      update_ID3(self.__title, episode, path, epNum, self.fallback_image)
+      update_ID3(self.__title, episode, path, epNum, self.__fallback_image)
     except Exception as e:
       logger.error(f'Failed setting ID3 info: {str(e)}')
 
