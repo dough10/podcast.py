@@ -22,10 +22,10 @@ def get_ep_number_from_title() -> list[str]:
   env_list = os.getenv('epnum_from_title', '')
   return env_list.split(',') if env_list else []
 
-def number_is_not_year(num):
+def number_is_not_year(num:int) -> bool:
   return num < 2000
 
-def save_image_to_tempfile(img:bytes):
+def save_image_to_tempfile(img:bytes) -> None:
   try:
     with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp_file:
       tmp_file.write(img)
@@ -38,7 +38,7 @@ def save_image_to_tempfile(img:bytes):
     raise Exception(f"Error saving image to tempfile: {str(e)}")
 
 # write an Image to audiofile ID3 info
-def id3Image(file:dict, art:bytes):
+def id3Image(file:dict, art:bytes) -> None:
   """
   Sets the ID3 artwork for the given file using the provided image data.
 
@@ -82,7 +82,7 @@ def id3Image(file:dict, art:bytes):
         logger.error(f"Error cleaning up temporary image file {tmp_file_path}: {str(e)}")
         raise 
 
-def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_image):
+def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_image) -> None:
   try:
     logger.info('Updating ID3 tags & encoding artwork')
     file = id3.load_file(path)
