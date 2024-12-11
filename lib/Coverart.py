@@ -18,7 +18,7 @@ class Coverart:
 
   def __init__(self, url:str) -> None:
     try:
-      logger.debug(f'Fetching image from: {url}')
+      logger.debug(f'Downloading: {url}')
       response = requests.get(url, headers=headers)
       response.raise_for_status()
 
@@ -30,11 +30,11 @@ class Coverart:
       width, height = self.__img.size
 
       if width > 1000 or height > 1000:
-        logger.debug(f'Resizing image: {width}px X {height}px -> 1000px X 1000px')
+        logger.debug(f'Resizing: {width}px X {height}px -> 1000px X 1000px')
         self.__img.thumbnail((1000, 1000), Image.LANCZOS)
 
       if self.__img.mode != 'RGB':
-        logger.debug(f'Convertings image mode: {self.__img.mode} -> RGB')
+        logger.debug(f'Converting image mode: {self.__img.mode} -> RGB')
         self.__img = self.__img.convert('RGB')    
 
     except requests.exceptions.RequestException as e:
@@ -50,7 +50,7 @@ class Coverart:
       return
 
     try:
-      logger.info(f'Saving cover art to: {self.__cover_path}')
+      logger.info(f'Saving: {self.__cover_path}')
       self.__img.save(self.__cover_path, 'JPEG')
     except OSError as e:
       raise Exception(f'Can not save cover image as JPG: {e}')
