@@ -9,9 +9,11 @@ from io import BytesIO
 
 try:
   from logs import Logs
+  from Coverart import Coverart
   from format_filename import format_filename
 except ModuleNotFoundError:
   from lib.logs import Logs
+  from lib.Coverart import Coverart
   from lib.format_filename import format_filename
 
 logger = Logs().get_logger()
@@ -71,16 +73,13 @@ def id3Image(file, art):
   tmp_file_path = None
   try:
     file['artwork'] = art
-  except KeyError as e:
-    logger.error(f"Error accessing 'artwork' in ID3 file: {str(e)}")
   except Exception as e:
-    logger.error('Error setting ID3 artwork:', str(e))
     try:
       logger.debug(f'Attempting temp_file workaround')
       tmp_file_path:str = save_image_to_tempfile(art)
       if tmp_file_path:
         file['artwork'] = load_saved_image(tmp_file_path)
-        logger.info('Using workaround for embedding image.')
+        logger.debug('Using workaround for embedding image.')
       else:
         logger.error("Failed to create temporary image file for workaround.")
     
@@ -172,34 +171,11 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
   try:
     if 'itunes:image' in episode:
       # If the episode metadata contains an 'itunes:image' key
-      url = episode['itunes:image']['@href']
-
-      img = requests.get(url)
-      img.raise_for_status()
-
-      logger.debug(f'itunes:image: {url}, status_code: {img.status_code}')
-
-      # Check if the image retrieval was successful
-      if 'content-type' in img.headers and 'image' in img.headers['content-type']:
-        try:
-          # Open the image using PIL
-          img = Image.open(BytesIO(img.content))
-
-          # Convert image to RGB mode if it's in RGBA mode
-          if img.mode != 'RGB':
-            logger.debug(f'Cnverting image mode: {img.mode} -> RGB')
-            img = img.convert('RGB')
-
-          bytes = BytesIO()
-          img.save(bytes, format='JPEG')
-  
-          id3Image(file, bytes.getvalue())
-        except Exception as e:
-          logger.error(f'Failed setting image from {url}: {e}')
-          use_fallback_image(file)
-      else:
-        # If retrieval failed, use a fallback image or previously loaded image
-        use_fallback_image(file)
+      try:
+        img = Coverart(episode['itunes:image']['@href'])
+        id3Image(file, img.bytes())
+      except Exception as e:
+        logger.error(f'Error setting artwork: {e}')
     else:
       # If episode metadata does not contain 'itunes:image' key
       use_fallback_image(file)

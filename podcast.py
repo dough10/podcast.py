@@ -176,9 +176,7 @@ class Podcast:
     Also, fetches and saves the cover art for the podcast.
     """
     if not os.path.exists(self.__podcast_folder):
-      error_str:str = f'Error accessing location {self.__podcast_folder}, Check if drive is mounted'
-      logger.error(error_str)
-      raise Exception(error_str)
+      raise Exception(f'Error accessing location {self.__podcast_folder}, Check if drive is mounted')
 
     if not os.path.exists(self.__location):
       logger.debug(f'Creating folder {self.__location}')
@@ -267,12 +265,12 @@ class Podcast:
     try:
       self.__mkdir()  # Ensure the directory and cover art exist
     except Exception as e:
-      logger.error(f'Error creating directory: {e}')
+      logger.critical(f'Error creating directory: {e}')
       return
     
     try: 
-      art = Coverart(self.__img_url)
-      art.save(self.__location)
+      self.__img = Coverart(self.__img_url)
+      self.__img.save(self.__location)
     except Exception as e:
       logger.critical(e)
       return
@@ -289,12 +287,12 @@ class Podcast:
     try:
       self.__mkdir()
     except Exception as e:
-      logger.error(f'Error creating directory: {e}')
+      logger.critical(f'Error creating directory: {e}')
       return
 
     try: 
-      art = Coverart(self.__img_url)
-      art.save(self.__location)
+      self.__img = Coverart(self.__img_url)
+      self.__img.save(self.__location)
     except Exception as e:
       logger.critical(e)
       return
@@ -313,12 +311,12 @@ class Podcast:
     try:
       self.__mkdir()
     except Exception as e:
-      logger.error(f'Error creating directory: {e}')
+      logger.critical(f'Error creating directory: {e}')
       return
 
     try: 
-      art = Coverart(self.__img_url)
-      art.save(self.__location)
+      self.__img = Coverart(self.__img_url)
+      self.__img.save(self.__location)
     except Exception as e:
       logger.critical(e)
       return
