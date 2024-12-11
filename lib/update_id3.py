@@ -16,11 +16,9 @@ except ModuleNotFoundError:
 
 logger = Logs().get_logger()
 
-
-get_ep_number_from_title = [
-  'Hospital Records Podcast',
-  'Deeper Shades of House - weekly Deep House Podcast with Lars Behrenroth'
-]
+def get_ep_number_from_title():
+  env_list = os.getenv('epnum_from_title', '')
+  return env_list.split(',') if env_list else []
 
 def number_is_not_year(num):
   return num < 2000
@@ -150,7 +148,7 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
     # return list of numbers in episode title (looking for "actual" episode number)
     numbers_in_string:list[int] = [int(s) for s in re.findall(r'\b\d+\b', episode['title'])]
 
-    if podcast_title in get_ep_number_from_title:
+    if podcast_title in get_ep_number_from_title():
       for num in numbers_in_string:
         if number_is_not_year(num):
           logger.debug(f'Using episode number from title: {num}')
