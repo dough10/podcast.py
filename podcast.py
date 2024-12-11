@@ -70,29 +70,29 @@ class Podcast:
       sys.exit()
 
     # Clean up and store the RSS feed URL
-    self.__xmlURL: str = url.strip()
+    self.__xml_url: str = url.strip()
 
     # Validate the URL
-    if not is_valid_url(self.__xmlURL):
-      logger.critical(f'Invalid URL address: {self.__xmlURL}')
+    if not is_valid_url(self.__xml_url):
+      logger.critical(f'Invalid URL address: {self.__xml_url}')
       return
 
     # Check if the URL is live and reachable
-    if not is_live_url(self.__xmlURL):
-      logger.critical(f'Error connecting to: {self.__xmlURL}')
+    if not is_live_url(self.__xml_url):
+      logger.critical(f'Error connecting to: {self.__xml_url}')
       return
 
     # Fetch podcast XML feed
     try:
-      logger.info(f'Fetching data from: {self.__xmlURL}')
-      res = requests.get(self.__xmlURL, headers=headers)
+      logger.info(f'Fetching data from: {self.__xml_url}')
+      res = requests.get(self.__xml_url, headers=headers)
       res.raise_for_status()
       xml = xmltodict.parse(res.content)
     except requests.exceptions.RequestException as e:
-      logger.critical(f'Error getting XML data from {self.__xmlURL}: {e}')
+      logger.critical(f'Error getting XML data from {self.__xml_url}: {e}')
       return
     except ValueError as e:
-      logger.critical(f'Failed parsing XML from {self.__xmlURL}: {e}')
+      logger.critical(f'Failed parsing XML from {self.__xml_url}: {e}')
       return
     except Exception as e:
       logger.critical(f'Unexpected error: {e}')
@@ -154,7 +154,7 @@ class Podcast:
     # Update progress on the UI (if window is passed)
     def prog_update(downloaded, total, start_time):
       if window:
-        window.evaluate_js(f'document.querySelector("audiosync-podcasts").update("{self.__xmlURL}", {downloaded}, {total}, {start_time}, "{stats["filename"]}")')
+        window.evaluate_js(f'document.querySelector("audiosync-podcasts").update("{self.__xml_url}", {downloaded}, {total}, {start_time}, "{stats["filename"]}")')
 
     # Prepare the path to save the downloaded episode
     path: str = os.path.join(self.__podcast_folder, stats['path'])
@@ -177,13 +177,18 @@ class Podcast:
       logger.debug(f'Cover exists: {self.__cover_jpg}')
       return
     # If cover art is not available, download it
-    logger.debug(f'Fetching image from: {self.__img_url}')
-    res = requests.get(self.__img_url, headers=headers)
-    if res.status_code == 200:
-      img = Image.open(BytesIO(res.content))
-    else:
-      logger.error("Failed to fetch image status code:", res.status_code)
+    try:
+      logger.debug(f'Fetching image from: {self.__img_url}')
+      res = requests.get(self.__img_url, headers=headers)
+      res.raise_for_status()
+    except requests.exceptions.RequestException as e:
+      logger.critical(f'Error getting image data from {self.__img_url}: {e}')
       return
+    except Exception as e:
+      logger.critical(f'Unexpected error: {e}')
+      return
+          
+    img = Image.open(BytesIO(res.content))
     logger.debug(f'Image format: {img.format}, Mode: {img.mode}, Size: {img.size}')
     width, height = img.size
     # Resize image if too large
@@ -239,13 +244,13 @@ class Podcast:
       window (object): UI window for progress updates (if applicable).
     """
     subs = subscriptions()
-    if self.__xmlURL in subs:
+    if self.__xml_url in subs:
       logger.info(f'Already Subscribed to {self.__title}')
       if window:
         window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Already Subscribed to {self.__title}");')
       return
 
-    subs.append(self.__xmlURL)
+    subs.append(self.__xml_url)
 
     # Update the subscription list in the .env file
     set_key(os.path.join(script_folder, '.env'), 'subscriptions', ','.join(subs))
@@ -267,8 +272,8 @@ class Podcast:
     """
     def go():
       subs = subscriptions()
-      if self.__xmlURL in subs:
-        updated = [x for x in subs if x != self.__xmlURL]
+      if self.__xml_url in subs:
+        updated = [x for x in subs if x != self.__xml_url]
         set_key(os.path.join(script_folder, '.env'), 'subscriptions', ','.join(updated))
         if window:
           try:
