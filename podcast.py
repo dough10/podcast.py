@@ -125,10 +125,14 @@ class Podcast:
     """
     logger.info('Using fallback image')
     if hasattr(self, '__img'):
-      id3Image(file, self.__img.bytes())
+      try:
+        id3Image(file, self.__img.bytes())
+      except Exception as e:
+        logger.error(f'Failed setting image from bytes: {e}')
     else:
       try:
-        id3Image(file, Coverart(location=os.path.join(self.__location, 'cover.jpg')))
+        art = Coverart(location=os.path.join(self.__location, 'cover.jpg'))
+        id3Image(file, art.bytes())
       except Exception as e:
         logger.error(f'Failed to load art from file: {e}')
 
