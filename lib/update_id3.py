@@ -142,7 +142,7 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
 
   if pub_date:
     file['year'] = pub_date.year
-    logger.debug(f'year: {file['year']}')
+    logger.debug(f'year: {file["year"]}')
 
 
   # Set track number
