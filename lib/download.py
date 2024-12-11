@@ -151,7 +151,7 @@ def dl_with_progress_bar(url: str, path: str, progress_callback=None, max_retrie
       if total_bytes > 0:
         elapsed_time = (round(time.time() * 1000) - start_time) / 1000  # Time in seconds
         download_rate = total_bytes / elapsed_time
-        logger.info(f"Download completed: {bytes_to_readable_size(total_bytes)} MB downloaded. "
+        logger.info(f"Download completed: {bytes_to_readable_size(total_bytes)} downloaded. "
                     f"Elapsed time: {seconds_to_readable_time(elapsed_time)}. "
                     f"Average download rate: {bytes_to_readable_rate(download_rate)}.")
 
