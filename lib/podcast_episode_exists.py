@@ -48,7 +48,7 @@ def podcast_episode_exists(podcast_title: str, episode: dict) -> dict:
     # Extract the download URL from the episode metadata
     download_url: str = episode['enclosure']['@url']
   except KeyError as e:
-    raise Exception(f'Failed getting an episode url from provided data: {e}')
+    raise Exception(f'Failed getting an episode url from provided data. Key does not exist: {e}')
   
   # Extract the file extension from the URL (e.g., .mp3, .m4a)
   file_ext: str = os.path.splitext(urlparse(download_url).path)[-1]
