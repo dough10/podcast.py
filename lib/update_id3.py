@@ -1,11 +1,8 @@
 import re
 import os
 import datetime
-import requests
 import tempfile
-from PIL import Image
 import music_tag as id3
-from io import BytesIO
 
 try:
   from logs import Logs
