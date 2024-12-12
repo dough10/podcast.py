@@ -111,7 +111,7 @@ class Podcast:
     ep_count = self.episodeCount()
     logger.info(f'{self.__title}: {str(ep_count)} episodes')
 
-  def __get_image_url(xml):
+  def __get_image_url(self, xml) -> str:
     image_url_paths = [
       'rss.channel.image.url',
       'rss.channel.image[0].url',
