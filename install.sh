@@ -76,8 +76,5 @@ fi
 echo -e "${YELLOW}Add cronjob? (y,n)${NC}"
 read -r cron
 if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
-  crontab -l 2>/dev/null; echo "0 0 * * * $package" | crontab - <<EOF
-  # Your cron job schedule (e.g., 0 0 * * *)
-  # Your script to run ($package)
-  EOF
+  crontab -l 2>/dev/null; echo "0 0 * * * $package" | crontab -
 fi
