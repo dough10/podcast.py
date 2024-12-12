@@ -82,7 +82,7 @@ class Podcast:
 
     # Fetch podcast XML feed
     try:
-      logger.info(f'Fetching data from: {self.__xml_url}')
+      logger.debug(f'Fetching data from: {self.__xml_url}')
       res = requests.get(self.__xml_url, headers=headers)
       res.raise_for_status()
       xml = xmltodict.parse(res.content)
