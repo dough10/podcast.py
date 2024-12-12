@@ -178,6 +178,7 @@ class Podcast:
     # Check if the episode has already been downloaded
     if stats['exists']:
       logger.info(f'Episode {stats["filename"]} already downloaded')
+      logger.info('<--------------------------------->')
       return
 
     # Ensure the file path is correctly formatted
