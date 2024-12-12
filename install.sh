@@ -76,5 +76,5 @@ fi
 echo -e "${YELLOW}Add cronjob? (y,n)${NC}"
 read -r cron
 if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
-  (crontab -l 2>/dev/null; echo \"0 0 * * * podcast.py") | crontab -
+  crontab -l 2>/dev/null; echo "0 0 * * * podcast.py" | crontab -
 fi
