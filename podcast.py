@@ -205,7 +205,7 @@ class Podcast:
     except Exception as e:
       logger.error(f'Failed setting ID3 info: {str(e)}')
 
-    logger.info('Download complete')
+    logger.info('<--------------------------------->')
 
   def __mkdir(self) -> None:
     """
