@@ -53,15 +53,7 @@ def podcast_episode_exists(podcast_title: str, episode: dict) -> dict:
   # Extract the file extension from the URL (e.g., .mp3, .m4a)
   file_ext: str = os.path.splitext(urlparse(download_url).path)[-1]
 
-  try:
-    # Try to format the filename using season and episode information
-    filename: str = format_filename(f"S{episode['itunes:season']}.E{episode['itunes:episode']}.{episode['title']}{file_ext}")
-  except KeyError:
-    # If no season or episode number exists, just use the episode title and file extension
-    filename: str = format_filename(f"{episode['title']}{file_ext}")
-  
-  # Replace spaces with dots in the filename
-  filename: str = filename.replace(' ', '.')
+  filename: str = format_filename(f"{episode['title']}{file_ext}").replace(' ', '.')
   
   # Create the full directory path for the podcast based on its title
   location: str = os.path.join(folder, format_filename(podcast_title))
