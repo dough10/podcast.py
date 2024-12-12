@@ -108,25 +108,35 @@ class Podcast:
       logger.critical(f'Failed finding image url: {e}')
       return
 
-    ep_count = self.episodeCount()
+    ep_count:int = self.episodeCount()
     logger.info(f'{self.__title}: {str(ep_count)} episodes')
 
-  def __get_image_url(self, xml) -> str:
-    image_url_paths = [
-      'rss.channel.image.url',
-      'rss.channel.image[0].url',
-      'rss.channel.itunes:image.@href'
-    ]
-    for path in image_url_paths:
-      try:
-        # Use a safer method to access nested elements
-        url = xml.xpath(path)
-        if url:
-            return url[0]
-      except Exception as e:
-        raise Exception(f"Error extracting image URL from path {path}: {e}")
+  def __get_image_url(self, xml:dict) -> str:
+    """Extracts the image URL from the given XML data.
 
-    raise Exception("Failed to find a valid image URL in the XML data.")
+    Args:
+      xml_data: The XML data, likely a parsed XML object.
+
+    Returns:
+      The extracted image URL, or None if not found.
+    """
+
+    try:
+      # Prioritize direct access to the 'url' attribute
+      image_url = xml['rss']['channel']['image']['url']
+    except (TypeError, KeyError):
+      # Handle potential list-based structure
+      try:
+        image_url = xml['rss']['channel']['image'][0]['url']
+      except (TypeError, KeyError):
+        # Handle iTunes-specific image format
+        try:
+          image_url = xml['rss']['channel']['itunes:image']['@href']
+        except (TypeError, KeyError):
+          # Log the error and return None
+          raise Exception("Failed to extract image URL from XML data.")
+
+    return image_url
 
   def __fallback_image(self, file) -> None:
     """
