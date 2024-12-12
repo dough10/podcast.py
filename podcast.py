@@ -394,8 +394,9 @@ if __name__ == "__main__":
     
   except IndexError:
     try:
-
       for url in subscriptions():
         Podcast(url).downloadNewest(False)
     except Exception as e:
       logger.error(f"Error downloading podcast: {e}")
+    except KeyboardInterrupt:
+      pass
