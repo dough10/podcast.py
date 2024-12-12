@@ -42,11 +42,11 @@ class Coverart:
         self.__img.thumbnail((1000, 1000), Image.LANCZOS)
 
       if self.__img.mode != 'RGB':
-        logger.debug(f'Converting image mode: {self.__img.mode} -> RGB')
+        logger.debug(f'Converting: {self.__img.mode} -> RGB')
         self.__img = self.__img.convert('RGB')    
 
     except requests.exceptions.RequestException as e:
-      raise DownloadError(f'Error getting image data from {url}: {e}')
+      raise DownloadError(f'Error getting image data: {e}')
     except Exception as e:
       raise DownloadError(f'Unexpected error: {e}')
   
