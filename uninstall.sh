@@ -6,3 +6,4 @@ set -e
 rm -rf ~/podcast.py
 rm -v ~/podcast.log
 sudo rm -fv /usr/local/bin/podcast.py*
+crontab -l | grep -v "podcast.py" | crontab -
