@@ -60,8 +60,8 @@ chmod +x -v $package
 echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ~/${package}/.env${NC}${YELLOW} to configure environment.${NC}"
 
 echo -e "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n) This will run ${NC}${CYAN}${package}${NC}${YELLOW} when terminal is opened${NC}"
-read -r response
-if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
+read -r bashrc
+if [ "$bashrc" == "y" ] || [ "$bashrc" == "Y" ]; then
   echo -e "${YELLOW}Backing up ${NC}${GREEN}~/.bashrc${NC}${YELLOW} to ${NC}${GREEN}~/.bashrc-backup${NC}"
   cp  ~/.bashrc  ~/.bashrc-backup 
 
@@ -76,5 +76,5 @@ fi
 echo -e "${YELLOW}Add cronjob? (y,n)${NC}"
 read -r cron
 if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
-  crontab -l 2>/dev/null; echo "0 0 * * * podcast.py" | crontab -
+  crontab -l 2>/dev/null; echo "0 0 * * * $package" | crontab -
 fi
