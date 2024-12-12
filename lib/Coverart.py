@@ -29,7 +29,7 @@ class Coverart:
         self.__img = Image.open(BytesIO(response.content))
 
       elif location:
-        logger.debug(f'Loading image from: {location}')
+        logger.debug(f'Loading: {location}')
         self.__img = Image.open(location)
       
       else: 
