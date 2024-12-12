@@ -63,7 +63,7 @@ class Coverart:
       raise Exception(f'Can not save cover image as JPG: {e}')
     
   def bytes(self) -> bytes:
-    logger.debug('Generating image bytes')
+    logger.debug('embedding image bytes')
     bytes = BytesIO()
     self.__img.save(bytes, format='JPEG')
     return bytes.getvalue()
