@@ -103,17 +103,30 @@ class Podcast:
 
     # Extract cover image URL (handle different XML structures)
     try:
-      self.__img_url: str = xml['rss']['channel']['image']['url']
-    except TypeError:
-      self.__img_url: str = xml['rss']['channel']['image'][0]['url']
-    except KeyError:
-      self.__img_url: str = xml['rss']['channel']['itunes:image']['@href']
+      self.__img_url: str = self.__get_image_url(xml)
     except Exception as e:
       logger.critical(f'Failed finding image url: {e}')
       return
 
     ep_count = self.episodeCount()
     logger.info(f'{self.__title}: {str(ep_count)} episodes')
+
+  def __get_image_url(xml):
+    image_url_paths = [
+      'rss.channel.image.url',
+      'rss.channel.image[0].url',
+      'rss.channel.itunes:image.@href'
+    ]
+    for path in image_url_paths:
+      try:
+        # Use a safer method to access nested elements
+        url = xml.xpath(path)
+        if url:
+            return url[0]
+      except Exception as e:
+        raise Exception(f"Error extracting image URL from path {path}: {e}")
+
+    raise Exception("Failed to find a valid image URL in the XML data.")
 
   def __fallback_image(self, file) -> None:
     """
