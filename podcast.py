@@ -146,7 +146,7 @@ class Podcast:
     Args:
       file (str): Path to the downloaded podcast file.
     """
-    logger.info('Using fallback image')
+    logger.debug('Using fallback image')
     if hasattr(self, '__img'):
       try:
         id3Image(file, self.__img.bytes())

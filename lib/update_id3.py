@@ -84,7 +84,7 @@ def id3Image(file:dict, art:bytes) -> None:
 
 def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_image) -> None:
   try:
-    logger.info('Updating ID3 tags & encoding artwork')
+    logger.debug('Updating ID3 tags & encoding artwork')
     file = id3.load_file(path)
 
   except FileNotFoundError:
