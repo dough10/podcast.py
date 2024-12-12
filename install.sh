@@ -73,7 +73,7 @@ if [ "$bashrc" == "y" ] || [ "$bashrc" == "Y" ]; then
   fi
 fi
 
-echo -e "${YELLOW}Add cronjob? (y,n)${NC}"
+echo -e "${YELLOW}Add cronjob? (y,n) will run ${NC}${CYAN}${package}${NC}${YELLOW} as midnight daily${NC}"
 read -r cron
 if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
   (crontab -l 2>/dev/null; echo "0 0 * * * $package") | crontab -
