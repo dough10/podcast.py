@@ -72,3 +72,9 @@ if [ "$response" == "y" ] || [ "$response" == "Y" ]; then
     echo -e "${YELLOW}Line already exists in ${NC}${GREEN}~/.bashrc${NC}${YELLOW}, skipping addition.${NC}"
   fi
 fi
+
+echo -e "${YELLOW}Add cronjob? (y,n)${NC}"
+read -r cron
+if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
+  (crontab -l 2>/dev/null; echo \"0 0 * * * podcast.py") | crontab -
+fi
