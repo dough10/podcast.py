@@ -15,8 +15,25 @@ except ModuleNotFoundError:
 logger = Logs().get_logger()
 
 class Coverart:
-
+  """
+  A class responsible for downloading, resizing, and saving image cover art.
+  It supports both downloading an image from a URL and loading from a local file.
+  Additionally, it ensures that the image meets certain criteria (e.g., size, format) 
+  and allows saving it to a specified location or getting it as a byte array.
+  """
   def __init__(self, url:str = '' , location:str = '') -> None:
+    """
+    Initializes the Coverart object by either downloading an image from the given URL 
+    or loading it from a specified local location.
+    
+    Parameters:
+    url (str): URL of the image to download (optional).
+    location (str): Local file path to the image (optional).
+    
+    Raises:
+    Exception: If neither 'url' nor 'location' are provided, or if the image content is invalid.
+    DownloadError: If any error occurs during downloading or processing the image.
+    """
     try:
       if url:
         logger.debug(f'Downloading: {url}')
@@ -51,6 +68,15 @@ class Coverart:
       raise DownloadError(f'Unexpected error: {e}')
   
   def save(self, path:str) -> None:
+    """
+    Saves the processed image as a 'cover.jpg' file at the specified path.
+
+    Parameters:
+    path (str): The directory where the image should be saved.
+
+    Raises:
+    Exception: If the image cannot be saved as a JPEG.
+    """
     self.__cover_path = os.path.join(path, 'cover.jpg')
 
     if os.path.exists(self.__cover_path):
@@ -63,6 +89,12 @@ class Coverart:
       raise Exception(f'Can not save cover image as JPG: {e}')
     
   def bytes(self) -> bytes:
+    """
+    Returns the image as a byte array in JPEG format.
+    
+    Returns:
+    bytes: The byte representation of the image.
+    """
     logger.debug('embedding image bytes')
     bytes = BytesIO()
     self.__img.save(bytes, format='JPEG')
