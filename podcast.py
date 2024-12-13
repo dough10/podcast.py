@@ -379,7 +379,7 @@ if __name__ == "__main__":
       unsub = ['unsubscribe', 'unsub', 'u']
 
       while True:
-        answer = action if action != '' else input("Please choose: subscribe or unsubscribe: ")
+        answer = action if action != '' else input("Please choose: subscribe, unsubscribe or getall: ")
         if answer.lower() in sub:
           Podcast(podcast_url).subscribe(False)
           break
