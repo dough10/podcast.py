@@ -394,8 +394,14 @@ if __name__ == "__main__":
     
   except IndexError:
     try:
-      for url in subscriptions():
+      subs = subscriptions()
+      
+      for url in subs:
         Podcast(url).downloadNewest(False)
+        
+      if not len(subs):
+        print('No subscriptions found.')
+        
     except Exception as e:
       logger.error(f"Error downloading podcast: {e}")
     except KeyboardInterrupt:
