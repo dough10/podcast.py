@@ -57,7 +57,6 @@ class Podcast:
     # Check internet connection before proceeding
     if not is_connected():
       message = 'Error connecting to the internet. Please check network connection and try again'
-      logger.critical(message)
       raise Exception(message)
 
     # Set podcast folder from .env
@@ -66,7 +65,6 @@ class Podcast:
     # Check if the podcast folder exists, if not exit the program
     if not os.path.exists(self.__podcast_folder):
       message =f'Folder {self.__podcast_folder} does not exist. Check .env'
-      logger.critical(message)
       raise Exception(message)
 
     # Clean up and store the RSS feed URL
@@ -397,7 +395,7 @@ if __name__ == "__main__":
           Podcast(podcast_url).downloadNewest(False)
           break
         else:
-          print('Invalid option. Please enter subscribe or unsubscribe.')
+          logger.info('Invalid option. Please enter subscribe or unsubscribe.')
     else:
         subs = subscriptions()
         
@@ -405,10 +403,10 @@ if __name__ == "__main__":
           Podcast(url).downloadNewest(False)
           
         if not len(subs):
-          print('No subscriptions found.')
+          logger.info('No subscriptions found.')
 
   except Exception as e:
-    print(f'Failed running podcast.py: {e}')
+    logger.critical(f'Failed running podcast.py: {e}')
 
   except KeyboardInterrupt:
     pass
