@@ -395,7 +395,7 @@ if __name__ == "__main__":
           Podcast(podcast_url).downloadNewest(False)
           break
         else:
-          logger.info('Invalid option. Please enter subscribe or unsubscribe.')
+          print('Invalid option. Please enter subscribe or unsubscribe.')
     else:
         subs = subscriptions()
         
@@ -403,10 +403,10 @@ if __name__ == "__main__":
           Podcast(url).downloadNewest(False)
           
         if not len(subs):
-          logger.info('No subscriptions found.')
+          print('No subscriptions found.')
 
   except Exception as e:
-    logger.critical(f'Failed running podcast.py: {e}')
+    print(f'Failed running podcast.py: {e}')
 
   except KeyboardInterrupt:
     pass
