@@ -56,16 +56,18 @@ class Podcast:
     """
     # Check internet connection before proceeding
     if not is_connected():
-      logger.critical('Error connecting to the internet. Please check network connection and try again')
-      sys.exit()
+      message = 'Error connecting to the internet. Please check network connection and try again'
+      logger.critical(message)
+      raise Exception(message)
 
     # Set podcast folder from .env
     self.__podcast_folder: str = os.getenv('podcast_folder')
 
     # Check if the podcast folder exists, if not exit the program
     if not os.path.exists(self.__podcast_folder):
-      logger.critical(f'Folder {self.__podcast_folder} does not exist. Check .env')
-      sys.exit()
+      message =f'Folder {self.__podcast_folder} does not exist. Check .env'
+      logger.critical(message)
+      raise Exception(message)
 
     # Clean up and store the RSS feed URL
     self.__xml_url: str = url.strip()
@@ -404,7 +406,7 @@ if __name__ == "__main__":
           
         if not len(subs):
           print('No subscriptions found.')
-          
+
   except Exception as e:
     print(f'Failed running podcast.py: {e}')
 
