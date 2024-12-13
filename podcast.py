@@ -370,42 +370,43 @@ class Podcast:
 
 
 if __name__ == "__main__":
-  if len(sys.argv) > 1:
-    podcast_url: str = sys.argv[1]
-    action: str = sys.argv[2] if len(sys.argv) > 2 else ''
+  try:
+    if len(sys.argv) > 1:
+      podcast_url: str = sys.argv[1]
+      action: str = sys.argv[2] if len(sys.argv) > 2 else ''
 
-    sub = ['subscribe', 'sub', 's']
-    unsub = ['unsubscribe', 'unsub', 'u']
-    download = ['getall', 'dlall', 'all']
-    newest = ['one', 'dl1', 'get1']
+      sub = ['subscribe', 'sub', 's']
+      unsub = ['unsubscribe', 'unsub', 'u']
+      download = ['getall', 'dlall', 'all']
+      newest = ['one', 'dl1', 'get1']
 
-    while True:
-      answer = action if action != '' else input("Please choose: subscribe, unsubscribe or getall: ")
-      if answer.lower() in sub:
-        Podcast(podcast_url).subscribe(False)
-        break
-      elif answer.lower() in unsub:
-        Podcast(podcast_url).unsubscribe(False)
-        break
-      elif answer.lower() in download:
-        Podcast(podcast_url).downloadAll(False)
-        break
-      elif answer.lower() in newest:
-        Podcast(podcast_url).downloadNewest(False)
-        break
-      else:
-        print('Invalid option. Please enter subscribe or unsubscribe.')
-  else:
-    try:
-      subs = subscriptions()
-      
-      for url in subs:
-        Podcast(url).downloadNewest(False)
+      while True:
+        answer = action if action != '' else input("Please choose: subscribe, unsubscribe or getall: ")
+        if answer.lower() in sub:
+          Podcast(podcast_url).subscribe(False)
+          break
+        elif answer.lower() in unsub:
+          Podcast(podcast_url).unsubscribe(False)
+          break
+        elif answer.lower() in download:
+          Podcast(podcast_url).downloadAll(False)
+          break
+        elif answer.lower() in newest:
+          Podcast(podcast_url).downloadNewest(False)
+          break
+        else:
+          print('Invalid option. Please enter subscribe or unsubscribe.')
+    else:
+        subs = subscriptions()
         
-      if not len(subs):
-        print('No subscriptions found.')
-        
-    except Exception as e:
-      logger.error(f"Error downloading podcasts: {e}")
-    except KeyboardInterrupt:
-      pass
+        for url in subs:
+          Podcast(url).downloadNewest(False)
+          
+        if not len(subs):
+          print('No subscriptions found.')
+          
+  except Exception as e:
+    print(f'Failed running podcast.py: {e}')
+
+  except KeyboardInterrupt:
+    pass
