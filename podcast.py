@@ -177,8 +177,8 @@ class Podcast:
 
     # Check if the episode has already been downloaded
     if stats['exists']:
-      logger.info(f'Episode {stats["filename"]} already downloaded')
-      logger.info('<--------------------------------->')
+      logger.info(f'{stats["filename"]} already downloaded')
+      logger.info('<------------------------------------------------------>')
       return
 
     # Ensure the file path is correctly formatted
@@ -206,7 +206,7 @@ class Podcast:
     except Exception as e:
       logger.error(f'Failed setting ID3 info: {str(e)}')
 
-    logger.info('<--------------------------------->')
+    logger.info('<------------------------------------------------------>')
 
   def __mkdir(self) -> None:
     """
@@ -385,6 +385,9 @@ if __name__ == "__main__":
           break
         elif answer.lower() in unsub:
           Podcast(podcast_url).unsubscribe(False)
+          break
+        elif answer.lower() == 'getall':
+          Podcast(podcast_url).downloadAll(False)
           break
         else:
           print('Invalid option. Please enter subscribe or unsubscribe.')
