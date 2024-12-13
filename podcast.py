@@ -370,32 +370,32 @@ class Podcast:
 
 
 if __name__ == "__main__":
-  try:
-    if len(sys.argv) > 1:
-      podcast_url: str = sys.argv[1]
-      action: str = sys.argv[2] if len(sys.argv) > 2 else ''
+  if len(sys.argv) > 1:
+    podcast_url: str = sys.argv[1]
+    action: str = sys.argv[2] if len(sys.argv) > 2 else ''
 
-      sub = ['subscribe', 'sub', 's']
-      unsub = ['unsubscribe', 'unsub', 'u']
+    sub = ['subscribe', 'sub', 's']
+    unsub = ['unsubscribe', 'unsub', 'u']
+    download = ['getall', 'dlall', 'all']
+    newest = ['one', 'dl1', 'get1']
 
-      while True:
-        answer = action if action != '' else input("Please choose: subscribe, unsubscribe or getall: ")
-        if answer.lower() in sub:
-          Podcast(podcast_url).subscribe(False)
-          break
-        elif answer.lower() in unsub:
-          Podcast(podcast_url).unsubscribe(False)
-          break
-        elif answer.lower() == 'getall':
-          Podcast(podcast_url).downloadAll(False)
-          break
-        else:
-          print('Invalid option. Please enter subscribe or unsubscribe.')
-    else:
-      raise IndexError()
-    
-    
-  except IndexError:
+    while True:
+      answer = action if action != '' else input("Please choose: subscribe, unsubscribe or getall: ")
+      if answer.lower() in sub:
+        Podcast(podcast_url).subscribe(False)
+        break
+      elif answer.lower() in unsub:
+        Podcast(podcast_url).unsubscribe(False)
+        break
+      elif answer.lower() in download:
+        Podcast(podcast_url).downloadAll(False)
+        break
+      elif answer.lower() in newest:
+        Podcast(podcast_url).downloadNewest(False)
+        break
+      else:
+        print('Invalid option. Please enter subscribe or unsubscribe.')
+  else:
     try:
       subs = subscriptions()
       
@@ -406,6 +406,6 @@ if __name__ == "__main__":
         print('No subscriptions found.')
         
     except Exception as e:
-      logger.error(f"Error downloading podcast: {e}")
+      logger.error(f"Error downloading podcasts: {e}")
     except KeyboardInterrupt:
       pass
