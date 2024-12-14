@@ -391,6 +391,7 @@ if __name__ == "__main__":
           break
         else:
           print('Invalid option. Please enter subscribe or unsubscribe.')
+          action = ''
     else:
       subs = subscriptions()
       
