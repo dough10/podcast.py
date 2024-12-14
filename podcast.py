@@ -191,12 +191,14 @@ class Podcast:
       dl_with_progress_bar(stats['url'], path, progress_callback=prog_update)
     except Exception as e:
       logger.error(f'Failed to download file: {str(e)}')
+      return
 
     # Apply ID3 tags to the downloaded file
     try:
       update_ID3(self.__title, episode, path, epNum, self.__fallback_image)
     except Exception as e:
       logger.error(f'Failed setting ID3 info: {str(e)}')
+      return
 
     logger.info('<------------------------------------------------------>')
 
@@ -271,7 +273,7 @@ class Podcast:
     def go():
       subs = subscriptions()
       if self.__xml_url in subs:
-        updated = [x for x in subs if x != self.__xml_url]
+        updated = [url for url in subs if url != self.__xml_url]
         set_key(os.path.join(script_folder, '.env'), 'subscriptions', ','.join(updated))
         if window:
           try:
@@ -375,7 +377,7 @@ if __name__ == "__main__":
       }
 
       while True:
-        answer = action if action else input("Please choose: subscribe = 1, unsubscribe = 2, download all episodes = 3, download newest episode = 4")
+        answer = action if action else input("Please choose subscribe: 1, unsubscribe: 2, download all episodes: 3, download newest episode: 4 - ")
         if answer in options:
           options[answer]()
           break
