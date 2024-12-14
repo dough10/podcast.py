@@ -368,30 +368,24 @@ if __name__ == "__main__":
   try:
     if len(sys.argv) > 1:
       podcast_url: str = sys.argv[1]
-      action: str = sys.argv[2] if len(sys.argv) > 2 else ''
+      action: str = sys.argv[2] if len(sys.argv) > 2 else None
 
-      sub = ['subscribe', 'sub', 's']
-      unsub = ['unsubscribe', 'unsub', 'u']
-      download = ['getall', 'dlall', 'all']
-      newest = ['one', 'dl1', 'get1', '1']
+      options = {
+        "1": lambda: Podcast(podcast_url).subscribe(False),
+        "2": lambda: Podcast(podcast_url).unsubscribe(False),
+        "3": lambda: Podcast(podcast_url).downloadAll(False),
+        "4": lambda: Podcast(podcast_url).downloadNewest(False)
+      }
 
       while True:
-        answer = action if action != '' else input("Please choose: subscribe, unsubscribe or getall: ")
-        if answer.lower() in sub:
-          Podcast(podcast_url).subscribe(False)
-          break
-        elif answer.lower() in unsub:
-          Podcast(podcast_url).unsubscribe(False)
-          break
-        elif answer.lower() in download:
-          Podcast(podcast_url).downloadAll(False)
-          break
-        elif answer.lower() in newest:
-          Podcast(podcast_url).downloadNewest(False)
+        answer = action if action else input("Please choose: subscribe = 1, unsubscribe = 2, download all episodes = 3, download newest episode = 4")
+        if answer in options:
+          options[answer]()
           break
         else:
-          print('Invalid option. Please enter subscribe or unsubscribe.')
-          action = ''
+          action = None
+          print('Invalid option. Please enter 1-4.')
+          
     else:
       subs = subscriptions()
       
