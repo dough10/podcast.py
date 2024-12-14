@@ -56,29 +56,25 @@ class Podcast:
     """
     # Check internet connection before proceeding
     if not is_connected():
-      message = 'Error connecting to the internet. Please check network connection and try again'
-      raise Exception(message)
+      raise Exception('Error connecting to the internet. Please check network connection and try again')
 
     # Set podcast folder from .env
     self.__podcast_folder: str = os.getenv('podcast_folder')
 
     # Check if the podcast folder exists, if not exit the program
     if not os.path.exists(self.__podcast_folder):
-      message =f'Folder {self.__podcast_folder} does not exist. Check .env'
-      raise Exception(message)
+      raise Exception(f'Folder {self.__podcast_folder} does not exist. Check .env')
 
     # Clean up and store the RSS feed URL
     self.__xml_url: str = url.strip()
 
     # Validate the URL
     if not is_valid_url(self.__xml_url):
-      logger.critical(f'Invalid URL address: {self.__xml_url}')
-      return
+      raise Exception(f'Invalid URL address: {self.__xml_url}')
 
     # Check if the URL is live and reachable
     if not is_live_url(self.__xml_url):
-      logger.critical(f'Error connecting to: {self.__xml_url}')
-      return
+      raise Exception(f'Error connecting to: {self.__xml_url}')
 
     # Fetch podcast XML feed
     try:
@@ -105,8 +101,7 @@ class Podcast:
     try:
       self.__img_url: str = self.__get_image_url(xml)
     except Exception as e:
-      logger.critical(f'Failed finding image url: {e}')
-      return
+      raise Exception(f'Failed finding image url: {e}')
 
     ep_count:int = self.episodeCount()
     logger.info(f'{self.__title}: {str(ep_count)} episodes')
@@ -378,7 +373,7 @@ if __name__ == "__main__":
       sub = ['subscribe', 'sub', 's']
       unsub = ['unsubscribe', 'unsub', 'u']
       download = ['getall', 'dlall', 'all']
-      newest = ['one', 'dl1', 'get1']
+      newest = ['one', 'dl1', 'get1', '1']
 
       while True:
         answer = action if action != '' else input("Please choose: subscribe, unsubscribe or getall: ")
@@ -395,15 +390,15 @@ if __name__ == "__main__":
           Podcast(podcast_url).downloadNewest(False)
           break
         else:
-          logger.info('Invalid option. Please enter subscribe or unsubscribe.')
+          print('Invalid option. Please enter subscribe or unsubscribe.')
     else:
-        subs = subscriptions()
+      subs = subscriptions()
+      
+      for url in subs:
+        Podcast(url).downloadNewest(False)
         
-        for url in subs:
-          Podcast(url).downloadNewest(False)
-          
-        if not len(subs):
-          logger.info('No subscriptions found.')
+      if not len(subs):
+        logger.info('No subscriptions found.')
 
   except Exception as e:
     logger.critical(f'Failed running podcast.py: {e}')
