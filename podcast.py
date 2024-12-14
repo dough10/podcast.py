@@ -83,14 +83,11 @@ class Podcast:
       res.raise_for_status()
       xml = xmltodict.parse(res.content)
     except requests.exceptions.RequestException as e:
-      logger.critical(f'Error getting XML data from {self.__xml_url}: {e}')
-      return
+      raise Exception(f'Error getting XML data from {self.__xml_url}: {e}')
     except ValueError as e:
-      logger.critical(f'Failed parsing XML from {self.__xml_url}: {e}')
-      return
+      raise Exception(f'Failed parsing XML from {self.__xml_url}: {e}')
     except Exception as e:
-      logger.critical(f'Unexpected error: {e}')
-      return
+      raise Exception(f'Unexpected error: {e}')
 
     # Extract podcast title and episode list from the XML
     self.__title: str = xml['rss']['channel']['title']  # Podcast title
@@ -149,8 +146,8 @@ class Podcast:
         logger.error(f'Failed setting image from bytes: {e}')
     else:
       try:
-        art = Coverart(location=os.path.join(self.__location, 'cover.jpg'))
-        id3Image(file, art.bytes())
+        self.__img = Coverart(location=os.path.join(self.__location, 'cover.jpg'))
+        id3Image(file, self.__img.bytes())
       except Exception as e:
         logger.error(f'Failed to load art from file: {e}')
 
