@@ -5,7 +5,6 @@ import sys
 import shutil
 import requests
 import xmltodict
-import threading
 from dotenv import load_dotenv, set_key
 from concurrent.futures import ThreadPoolExecutor
 
