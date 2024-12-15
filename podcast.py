@@ -5,7 +5,9 @@ import sys
 import shutil
 import requests
 import xmltodict
+import threading
 from dotenv import load_dotenv, set_key
+from concurrent.futures import ThreadPoolExecutor
 
 from lib.Coverart import Coverart
 from lib.question import question
@@ -305,8 +307,7 @@ class Podcast:
     for ndx in range(count):
       self.__fileDL(self.__list[ndx], self.episodeCount() - ndx, window)
 
-
-if __name__ == "__main__":
+def main() -> None:
   try:
     if len(sys.argv) > 1:
       podcast_url: str = sys.argv[1]
@@ -330,9 +331,12 @@ if __name__ == "__main__":
           
     else:
       subs = subscriptions()
-      
-      for url in subs:
+
+      def newest(url:str) -> None:
         Podcast(url).downloadNewest(False)
+
+      with ThreadPoolExecutor(max_workers=4) as executor:
+          executor.map(newest, subs)
         
       if not len(subs):
         logger.info('No subscriptions found.')
@@ -342,3 +346,7 @@ if __name__ == "__main__":
 
   except KeyboardInterrupt:
     pass
+
+
+if __name__ == "__main__":
+  main()
