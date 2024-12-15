@@ -16,6 +16,8 @@ from lib.logs import Logs
 from lib.download import dl_with_progress_bar
 from lib.podcast_episode_exists import podcast_episode_exists
 from lib.is_live_url import is_live_url, is_connected, is_valid_url
+from lib.get_image_url import get_image_url
+from lib.subscriptions import subscriptions
 
 logger = Logs().get_logger()
 
@@ -23,39 +25,6 @@ load_dotenv()
 
 file_path = os.path.abspath(__file__)
 script_folder = os.path.dirname(file_path)
-
-def get_image_url(xml:dict) -> str:
-  """Extracts the image URL from the given XML data.
-
-  Args:
-    xml: The XML data, likely a parsed XML object.
-
-  Returns:
-    The extracted image URL, or None if not found.
-  """
-  try:
-    if isinstance(xml['rss']['channel']['image'], list):
-      return xml['rss']['channel']['image'][0]['url']
-    
-    return xml['rss']['channel']['image']['url']
-
-  except KeyError:
-    pass
-
-  try:
-    return xml['rss']['channel']['itunes:image']['@href']
-  except KeyError:
-    return None
-
-def subscriptions():
-  """
-  Fetches the list of subscribed podcast URLs from the .env file.
-  
-  Returns:
-    List of podcast URLs (str).
-  """
-  sub_list: str = os.getenv('subscriptions', '')
-  return sub_list.split(',') if sub_list else []
 
 class Podcast:
   """
@@ -92,24 +61,24 @@ class Podcast:
       res = requests.get(self.__xml_url, headers=headers)
       res.raise_for_status()
       xml = xmltodict.parse(res.content)
+
+      self.__title: str = xml['rss']['channel']['title']  # Podcast title
+      self.__list: list[dict] = xml['rss']['channel']['item']  # List of episodes
+      self.__location: str = os.path.join(self.__podcast_folder, format_filename(self.__title))  # Folder path for the podcast
+
+
+      self.__img_url: str = get_image_url(xml)
+      if not self.__img_url:
+        raise Exception(f'Failed to find an image url in xml data')
+
+      logger.info(f'{self.__title}: {str(self.episodeCount())} episodes')
+
     except requests.exceptions.RequestException as e:
       raise Exception(f'Error getting XML data from {self.__xml_url}: {e}')
     except ValueError as e:
       raise Exception(f'Failed parsing XML from {self.__xml_url}: {e}')
     except Exception as e:
       raise Exception(f'Unexpected error: {e}')
-
-    self.__title: str = xml['rss']['channel']['title']  # Podcast title
-    self.__list: list[dict] = xml['rss']['channel']['item']  # List of episodes
-    self.__location: str = os.path.join(self.__podcast_folder, format_filename(self.__title))  # Folder path for the podcast
-
-    try:
-      self.__img_url: str = get_image_url(xml)
-    except Exception as e:
-      raise Exception(f'Failed finding image url: {e}')
-
-    ep_count:int = self.episodeCount()
-    logger.info(f'{self.__title}: {str(ep_count)} episodes')
     
   def __fallback_image(self, file) -> None:
     """

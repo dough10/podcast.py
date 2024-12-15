@@ -35,13 +35,13 @@ def save_image_to_tempfile(img:bytes) -> None:
     raise Exception(f"Error saving image to tempfile: {str(e)}")
 
 # write an Image to audiofile ID3 info
-def id3Image(file:dict, art:bytes) -> None:
+def id3Image(file: dict, art: bytes) -> None:
   """
   Sets the ID3 artwork for the given file using the provided image data.
 
   Args:
-    file (id3.ID3): The ID3 file object.
-    img (bytes): The image data.
+    file (dict): The ID3 file object.
+    art (bytes): The image data.
 
   Returns:
     None
@@ -49,35 +49,37 @@ def id3Image(file:dict, art:bytes) -> None:
   tmp_file_path = None
   try:
     file['artwork'] = art
+    logger.debug('Image set directly.')
   except Exception as e:
+    logger.warning(f"Failed to set artwork directly: {e}")
     try:
-      logger.debug(f'Attempting temp_file workaround')
-      tmp_file_path:str = save_image_to_tempfile(art)
+      tmp_file_path = save_image_to_tempfile(art)
       if tmp_file_path:
         try:
           img = Coverart(location=tmp_file_path)
           file['artwork'] = img.bytes()
           logger.debug('Using workaround for embedding image.')
         except Exception as e:
-          logger.error(f'Failed to load art from file: {e}')
+          logger.error(f"Failed to load image from temporary file: {e}")
+          raise
       else:
-        logger.error("Failed to create temporary image file for workaround.")
-    
-    except IOError as e:   
-      raise IOError(f'IOError creating temp_file: {e}')
-     
+        raise Exception("Failed to create temporary image file.")
+    except (IOError, OSError) as e:
+      logger.error(f"File error during temporary image file creation: {e}")
+      raise
     except Exception as e:
-      raise Exception('Error using image temp_file workaround:', str(e))
-      
-      
-    finally:
+      logger.error(f"Unexpected error during temp file workaround: {e}")
+      raise
+
+  finally:
+    if tmp_file_path:
       try:
-        if tmp_file_path and os.path.exists(tmp_file_path):
+        if os.path.exists(tmp_file_path):
           os.remove(tmp_file_path)
-          logger.debug(f"Cleaned up temporary image file at {tmp_file_path}")
+          logger.debug(f"Successfully cleaned up temporary image file at {tmp_file_path}")
       except OSError as e:
-        logger.error(f"Error cleaning up temporary image file {tmp_file_path}: {str(e)}")
-        raise 
+        logger.error(f"Error cleaning up temporary image file at {tmp_file_path}: {e}")
+
 
 def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_image) -> None:
   try:
