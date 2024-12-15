@@ -30,9 +30,11 @@ def save_image_to_tempfile(img:bytes) -> None:
     tmp_file_path = tmp_file.name
     return tmp_file_path
   except IOError as e:
-    raise IOError(f"Error creating temp file: {str(e)}")
+    logger.error(f"Error creating temp file: {str(e)}")
+    raise
   except Exception as e:
-    raise Exception(f"Error saving image to tempfile: {str(e)}")
+    logger.error(f"Error saving image to tempfile: {str(e)}")
+    raise
 
 # write an Image to audiofile ID3 info
 def id3Image(file: dict, art: bytes) -> None:
@@ -56,9 +58,9 @@ def id3Image(file: dict, art: bytes) -> None:
       tmp_file_path = save_image_to_tempfile(art)
       if tmp_file_path:
         try:
+          logger.debug('Using workaround for embedding image.')
           img = Coverart(location=tmp_file_path)
           file['artwork'] = img.bytes()
-          logger.debug('Using workaround for embedding image.')
         except Exception as e:
           logger.error(f"Failed to load image from temporary file: {e}")
           raise
