@@ -81,7 +81,7 @@ def id3Image(file:dict, art:bytes) -> None:
 
 def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_image) -> None:
   try:
-    logger.debug('Updating ID3 tags & encoding artwork')
+    logger.debug('Updating ID3 tags')
     file = id3.load_file(path)
 
   except FileNotFoundError:
@@ -130,7 +130,8 @@ def update_ID3(podcast_title:str, episode:dict, path:str, epNum, use_fallback_im
       logger.debug(f'year: {file["year"]}')
     except Exception as e:
       logger.error(f'Failed setting year: {e}')
-
+  else:
+    logger.debug('Year: not set')
 
   # Set track number
   try:
