@@ -7,7 +7,6 @@ import requests
 import xmltodict
 from dotenv import load_dotenv, set_key
 
-# Importing various helper functions and modules
 from lib.Coverart import Coverart
 from lib.question import question
 from lib.format_filename import format_filename
