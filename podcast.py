@@ -122,7 +122,6 @@ class Podcast:
 
     if stats['exists']:
       logger.info(f'{stats["filename"]} already downloaded')
-      logger.info('<------------------------------------------------------>')
       return
 
     if stats['path'].startswith('\\') or stats['path'].startswith('/'):
@@ -146,8 +145,6 @@ class Podcast:
     except Exception as e:
       logger.error(f'Failed setting ID3 info: {str(e)}')
       return
-
-    logger.info('<------------------------------------------------------>')
 
   def __mkdir(self) -> None:
     """
