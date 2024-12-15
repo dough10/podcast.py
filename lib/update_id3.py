@@ -22,7 +22,8 @@ def get_ep_number_from_title():
 def number_is_not_year(num:int) -> bool:
   return num < 2000
 
-def save_image_to_tempfile(img:bytes) -> None:
+def save_image_to_tempfile(img:bytes) -> str:
+  tmp_file_path = None
   try:
     with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp_file:
       tmp_file.write(img)
