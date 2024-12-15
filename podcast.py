@@ -377,7 +377,8 @@ if __name__ == "__main__":
       }
 
       while True:
-        answer = action if action else input("Please choose subscribe: 1, unsubscribe: 2, download all episodes: 3, download newest episode: 4 - ")
+        print('Choose an option: ')
+        answer = action if action else input("subscribe: 1, unsubscribe: 2, download all episodes: 3, download newest episode: 4 - ")
         if answer in options:
           options[answer]()
           break
