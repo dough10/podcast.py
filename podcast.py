@@ -124,7 +124,9 @@ class Podcast:
       try:
         id3Image(file, self.__img.bytes())
       except Exception as e:
-        logger.error(f'Failed setting image from bytes: {e}')
+        logger.error(f'Failed setting image from __img variable: {e}')
+        self.__img = None
+        self.__fallback_image(file)
     else:
       try:
         self.__img = Coverart(location=os.path.join(self.__location, 'cover.jpg'))
