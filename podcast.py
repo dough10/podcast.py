@@ -24,6 +24,29 @@ load_dotenv()
 file_path = os.path.abspath(__file__)
 script_folder = os.path.dirname(file_path)
 
+def get_image_url(xml:dict) -> str:
+  """Extracts the image URL from the given XML data.
+
+  Args:
+    xml: The XML data, likely a parsed XML object.
+
+  Returns:
+    The extracted image URL, or None if not found.
+  """
+  try:
+    if isinstance(xml['rss']['channel']['image'], list):
+      return xml['rss']['channel']['image'][0]['url']
+    
+    return xml['rss']['channel']['image']['url']
+
+  except KeyError:
+    pass
+
+  try:
+    return xml['rss']['channel']['itunes:image']['@href']
+  except KeyError:
+    return None
+
 def subscriptions():
   """
   Fetches the list of subscribed podcast URLs from the .env file.
@@ -81,36 +104,13 @@ class Podcast:
     self.__location: str = os.path.join(self.__podcast_folder, format_filename(self.__title))  # Folder path for the podcast
 
     try:
-      self.__img_url: str = self.__get_image_url(xml)
+      self.__img_url: str = get_image_url(xml)
     except Exception as e:
       raise Exception(f'Failed finding image url: {e}')
 
     ep_count:int = self.episodeCount()
     logger.info(f'{self.__title}: {str(ep_count)} episodes')
-
-  def __get_image_url(self, xml:dict) -> str:
-    """Extracts the image URL from the given XML data.
-
-    Args:
-      xml_data: The XML data, likely a parsed XML object.
-
-    Returns:
-      The extracted image URL, or None if not found.
-    """
-
-    try:
-      image_url = xml['rss']['channel']['image']['url']
-    except (TypeError, KeyError):
-      try:
-        image_url = xml['rss']['channel']['image'][0]['url']
-      except (TypeError, KeyError):
-        try:
-          image_url = xml['rss']['channel']['itunes:image']['@href']
-        except (TypeError, KeyError):
-          raise Exception("Failed to extract image URL from XML data.")
-
-    return image_url
-
+    
   def __fallback_image(self, file) -> None:
     """
     Handles the fallback image (in case the main cover art is not available) 
