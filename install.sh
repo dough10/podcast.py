@@ -53,9 +53,9 @@ sudo ln -sfv ~/$package/uninstall.sh /usr/local/bin/${package}_uninstall
 sudo ln -sfv ~/$package/sh/reinstall.sh /usr/local/bin/${package}_reinstall
 
 echo -e "${YELLOW}Adding execute permissions${NC}"
-chmod +x -v sh/*.sh
+chmod +x -v ./sh/*.sh
 chmod +x -v ./*.sh
-chmod +x -v $package
+chmod +x -v "./$package"
 
 echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ~/${package}/.env${NC}${YELLOW} to configure environment.${NC}"
 
