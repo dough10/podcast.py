@@ -14,7 +14,7 @@ from lib.format_filename import format_filename
 from lib.headers import headers
 from lib.update_id3 import update_ID3, id3Image
 from lib.logs import Logs
-from lib.download import dl_with_progress_bar, DownloadError
+from lib.download import dl_with_progress_bar
 from lib.podcast_episode_exists import podcast_episode_exists
 from lib.is_live_url import is_live_url, is_connected, is_valid_url
 
