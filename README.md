@@ -1,30 +1,33 @@
 # podcast.py
 
+## Install
+
 ```text
 cd ~/ && curl -O https://raw.githubusercontent.com/dough10/podcast.py/refs/heads/main/install.sh && bash install.sh && rm install.sh
 ```
 
 <https://podcastindex.org/> to find xml addresses
 
-subscribe:
+### subscribe
 
 ```bash
 podcast.py https://example.com/feed.xml 1
 ```
 
-unsubscribe:
+### unsubscribe
 
 ```bash
 podcast.py https://example.com/feed.xml 2
 ```
 
-download all episodes in xml without subscribing:
+### download all episodes in xml without subscribing
 
 ```bash
 podcast.py https://example.com/feed.xml 3
 ```
 
-download newest episode without subscribing:
+### download newest episode without subscribing
+
 ```bash
 podcast.py https://example.com/feed.xml 4
 ```
