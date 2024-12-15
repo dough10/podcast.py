@@ -349,7 +349,7 @@ if __name__ == "__main__":
       }
 
       while True:
-        answer = action if action else input("Choose an option: subscribe: 1, unsubscribe: 2, download all episodes: 3, download newest episode: 4 - ")
+        answer = action if action else input("Choose an option: subscribe: 1, unsubscribe: 2, download all: 3, download newest: 4 - ")
         if answer in options:
           options[answer](False)
           break
