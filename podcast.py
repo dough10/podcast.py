@@ -18,17 +18,13 @@ from lib.download import dl_with_progress_bar
 from lib.podcast_episode_exists import podcast_episode_exists
 from lib.is_live_url import is_live_url, is_connected, is_valid_url
 
-# Initialize logger
 logger = Logs().get_logger()
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Get the absolute path of the script file and the folder containing it
 file_path = os.path.abspath(__file__)
 script_folder = os.path.dirname(file_path)
 
-# Function to return the list of subscribed podcasts from environment variables
 def subscriptions():
   """
   Fetches the list of subscribed podcast URLs from the .env file.
@@ -39,7 +35,6 @@ def subscriptions():
   sub_list: str = os.getenv('subscriptions', '')
   return sub_list.split(',') if sub_list else []
 
-# Main Podcast class for handling podcast operations like subscribing, downloading, etc.
 class Podcast:
   """
   A class to represent a podcast and handle related operations like
@@ -54,29 +49,22 @@ class Podcast:
     Args:
       url (str): The URL to the podcast RSS feed.
     """
-    # Check internet connection before proceeding
     if not is_connected():
       raise Exception('Error connecting to the internet. Please check network connection and try again')
 
-    # Set podcast folder from .env
     self.__podcast_folder: str = os.getenv('podcast_folder')
 
-    # Check if the podcast folder exists, if not exit the program
     if not os.path.exists(self.__podcast_folder):
       raise Exception(f'Folder {self.__podcast_folder} does not exist. Check .env')
 
-    # Clean up and store the RSS feed URL
     self.__xml_url: str = url.strip()
 
-    # Validate the URL
     if not is_valid_url(self.__xml_url):
       raise Exception(f'Invalid URL address: {self.__xml_url}')
 
-    # Check if the URL is live and reachable
     if not is_live_url(self.__xml_url):
       raise Exception(f'Error connecting to: {self.__xml_url}')
 
-    # Fetch podcast XML feed
     try:
       logger.debug(f'Fetching data from: {self.__xml_url}')
       res = requests.get(self.__xml_url, headers=headers)
@@ -89,12 +77,10 @@ class Podcast:
     except Exception as e:
       raise Exception(f'Unexpected error: {e}')
 
-    # Extract podcast title and episode list from the XML
     self.__title: str = xml['rss']['channel']['title']  # Podcast title
     self.__list: list[dict] = xml['rss']['channel']['item']  # List of episodes
     self.__location: str = os.path.join(self.__podcast_folder, format_filename(self.__title))  # Folder path for the podcast
 
-    # Extract cover image URL (handle different XML structures)
     try:
       self.__img_url: str = self.__get_image_url(xml)
     except Exception as e:
@@ -114,18 +100,14 @@ class Podcast:
     """
 
     try:
-      # Prioritize direct access to the 'url' attribute
       image_url = xml['rss']['channel']['image']['url']
     except (TypeError, KeyError):
-      # Handle potential list-based structure
       try:
         image_url = xml['rss']['channel']['image'][0]['url']
       except (TypeError, KeyError):
-        # Handle iTunes-specific image format
         try:
           image_url = xml['rss']['channel']['itunes:image']['@href']
         except (TypeError, KeyError):
-          # Log the error and return None
           raise Exception("Failed to extract image URL from XML data.")
 
     return image_url
@@ -167,33 +149,27 @@ class Podcast:
       logger.critical(f'Failed checking episode status: {e}')
       return
 
-    # Check if the episode has already been downloaded
     if stats['exists']:
       logger.info(f'{stats["filename"]} already downloaded')
       logger.info('<------------------------------------------------------>')
       return
 
-    # Ensure the file path is correctly formatted
     if stats['path'].startswith('\\') or stats['path'].startswith('/'):
       stats['path'] = stats['path'][1:]
 
-    # Update progress on the UI (if window is passed)
     def prog_update(downloaded, total, start_time):
       if window:
         window.evaluate_js(f'document.querySelector("audiosync-podcasts").update("{self.__xml_url}", {downloaded}, {total}, {start_time}, "{stats["filename"]}")')
 
-    # Prepare the path to save the downloaded episode
     path: str = os.path.join(self.__podcast_folder, stats['path'])
 
     logger.info(f'Downloading - {stats["filename"]}')
-    # Download the episode with progress reporting
     try:
       dl_with_progress_bar(stats['url'], path, progress_callback=prog_update)
     except Exception as e:
       logger.error(f'Failed to download file: {str(e)}')
       return
 
-    # Apply ID3 tags to the downloaded file
     try:
       update_ID3(self.__title, episode, path, epNum, self.__fallback_image)
     except Exception as e:
@@ -252,14 +228,12 @@ class Podcast:
 
     subs.append(self.__xml_url)
 
-    # Update the subscription list in the .env file
     set_key(os.path.join(script_folder, '.env'), 'subscriptions', ','.join(subs))
 
     if window:
       window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Subscribed!");')
     
     logger.info('Subscribed: Starting download. This may take a minute.')
-    # Start downloading the newest episode
     self.downloadNewest(window)
 
   def unsubscribe(self, window) -> None:
@@ -282,7 +256,6 @@ class Podcast:
           except:
             pass
 
-    # Execute unsubscription process
     if window:
       go()
       return
@@ -304,7 +277,7 @@ class Podcast:
       window (object): UI window for progress updates (if applicable).
     """
     try:
-      self.__mkdir()  # Ensure the directory and cover art exist
+      self.__mkdir()
     except Exception as e:
       logger.critical(f'Error creating directory: {e}')
       return
@@ -315,7 +288,7 @@ class Podcast:
       logger.critical(f'Failed getting cover.jpg: {e}')
       return
 
-    self.__fileDL(self.__list[0], self.episodeCount(), window)  # Download the newest episode
+    self.__fileDL(self.__list[0], self.episodeCount(), window)
 
   def downloadAll(self, window) -> None:
     """
