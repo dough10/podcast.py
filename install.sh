@@ -51,13 +51,14 @@ echo -e "${YELLOW}Installing global commands${NC}"
 sudo ln -sfv ~/$package/sh/podcast.sh /usr/local/bin/${package}
 sudo ln -sfv ~/$package/uninstall.sh /usr/local/bin/${package}_uninstall
 sudo ln -sfv ~/$package/sh/reinstall.sh /usr/local/bin/${package}_reinstall
+sudo ln -sfv ~/$package/sh/config.sh /usr/local/bin/${package}_config
 
 echo -e "${YELLOW}Adding execute permissions${NC}"
 chmod +x -v ./sh/*.sh
 chmod +x -v ./*.sh
 chmod +x -v "./$package"
 
-echo -e "${YELLOW}Install complete. run ${NC}${CYAN}nano ~/${package}/.env${NC}${YELLOW} to configure environment.${NC}"
+echo -e "${YELLOW}Install complete. run ${NC}${CYAN}${package}_config${NC}${YELLOW} to configure environment.${NC}"
 
 echo -e "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n) This will run ${NC}${CYAN}${package}${NC}${YELLOW} when terminal is opened${NC}"
 read -r bashrc
@@ -73,7 +74,7 @@ if [ "$bashrc" == "y" ] || [ "$bashrc" == "Y" ]; then
   fi
 fi
 
-echo -e "${YELLOW}Add cronjob? (y,n) will run ${NC}${CYAN}${package}${NC}${YELLOW} at midnight daily${NC}"
+echo -e "${YELLOW}Add cronjob? (y,n) will run ${NC}${CYAN}${package}${NC}${YELLOW} daily at midnight${NC}"
 read -r cron
 if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
   (crontab -l 2>/dev/null; echo "0 0 * * * $package") | crontab -
