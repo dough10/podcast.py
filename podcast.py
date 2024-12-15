@@ -331,7 +331,7 @@ def main() -> None:
       def newest(url:str) -> None:
         Podcast(url).downloadNewest(False)
 
-      with ThreadPoolExecutor(max_workers=4) as executor:
+      with ThreadPoolExecutor(max_workers=8) as executor:
           executor.map(newest, subs)
         
       if not len(subs):
