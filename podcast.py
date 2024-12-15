@@ -6,7 +6,6 @@ import shutil
 import requests
 import xmltodict
 from dotenv import load_dotenv, set_key
-from concurrent.futures import ThreadPoolExecutor
 
 from lib.Coverart import Coverart
 from lib.question import question
@@ -328,11 +327,8 @@ def main() -> None:
     else:
       subs = subscriptions()
 
-      def newest(url:str) -> None:
+      for url in subs:
         Podcast(url).downloadNewest(False)
-
-      with ThreadPoolExecutor(max_workers=8) as executor:
-          executor.map(newest, subs)
         
       if not len(subs):
         logger.info('No subscriptions found.')
