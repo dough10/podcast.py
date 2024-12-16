@@ -309,16 +309,16 @@ def main() -> None:
       action: str = sys.argv[2] if len(sys.argv) > 2 else None
 
       options = {
-        "1": Podcast(podcast_url).subscribe,
-        "2": Podcast(podcast_url).unsubscribe,
-        "3": Podcast(podcast_url).downloadAll,
-        "4": Podcast(podcast_url).downloadNewest
+        "1": lambda: Podcast(podcast_url).subscribe(False),
+        "2": lambda: Podcast(podcast_url).unsubscribe(False),
+        "3": lambda: Podcast(podcast_url).downloadAll(False),
+        "4": lambda: Podcast(podcast_url).downloadNewest(False)
       }
 
       while True:
         answer = action if action else input("Choose an option: subscribe: 1, unsubscribe: 2, download all: 3, download newest: 4 - ")
         if answer in options:
-          options[answer](False)
+          options[answer]()
           break
         else:
           action = None
