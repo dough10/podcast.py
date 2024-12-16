@@ -178,7 +178,7 @@ class Podcast:
     """
     return len(self.__list)
 
-  def subscribe(self, window) -> None:
+  def subscribe(self, window, confirmation:str) -> None:
     """
     Subscribes to the podcast by adding it to the subscription list
     and starts downloading the newest episode.
@@ -200,10 +200,10 @@ class Podcast:
     logger.info('Subscribed!')
     if window:
       window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Subscribed!");')
-    elif question('Download newest episode? (y,n): '):
+    elif int(confirmation) or question('Download newest episode? (y,n): '):
       self.downloadNewest(window)
 
-  def unsubscribe(self, window) -> None:
+  def unsubscribe(self, window, confirmation:str) -> None:
     """
     Unsubscribes from the podcast by removing it from the subscription list
     and optionally deleting the downloaded files.
@@ -216,20 +216,23 @@ class Podcast:
       if self.__xml_url in subs:
         updated = [url for url in subs if url != self.__xml_url]
         set_key(os.path.join(script_folder, '.env'), 'subscriptions', ','.join(updated))
+        logger.info('Unsubscribed!')
         if window:
           try:
             shutil.rmtree(self.__location)
             logger.info(f'Deleting directory {self.__location}')
           except:
             pass
+      else:
+        logger.warning(f'You are not subscribed to {self.__xml_url}.')
 
     if window:
       go()
       return
 
-    if question(f'is "{self.__title}" the right podcast? (yes/no) '):
+    if int(confirmation) or question(f'is "{self.__title}" the right podcast? (yes/no) '):
       go()
-      if question('Remove all downloaded files? (yes/no) ') and question('Files cannot be recovered. Are you sure? (yes/no) '):
+      if int(confirmation) or question('Remove all downloaded files? (yes/no) ') and question('Files cannot be recovered. Are you sure? (yes/no) '):
         try:
           shutil.rmtree(self.__location)
           logger.info(f'Deleting directory {self.__location}')
@@ -307,10 +310,11 @@ def main() -> None:
     if len(sys.argv) > 1:
       podcast_url: str = sys.argv[1]
       action: str = sys.argv[2] if len(sys.argv) > 2 else None
+      confirmation: str = sys.argv[3] if len(sys.argv) > 3 else None
 
       options = {
-        "1": lambda: Podcast(podcast_url).subscribe(False),
-        "2": lambda: Podcast(podcast_url).unsubscribe(False),
+        "1": lambda: Podcast(podcast_url).subscribe(False, confirmation),
+        "2": lambda: Podcast(podcast_url).unsubscribe(False, confirmation),
         "3": lambda: Podcast(podcast_url).downloadAll(False),
         "4": lambda: Podcast(podcast_url).downloadNewest(False)
       }

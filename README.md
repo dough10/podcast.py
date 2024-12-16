@@ -8,13 +8,25 @@ cd ~/ && curl -O https://raw.githubusercontent.com/dough10/podcast.py/refs/heads
 
 <https://podcastindex.org/> to find xml addresses
 
-### subscribe
+### subscribe and prompt
 
 ```bash
 podcast.py https://example.com/feed.xml 1
 ```
 
-### unsubscribe
+### subscribe without downloading
+
+```bash
+podcast.py https://example.com/feed.xml 1 0
+```
+
+### subscribe with download
+
+```bash
+podcast.py https://example.com/feed.xml 1 1
+```
+
+### unsubscribe and prompt
 
 ```bash
 podcast.py https://example.com/feed.xml 2
