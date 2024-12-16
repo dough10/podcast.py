@@ -197,11 +197,11 @@ class Podcast:
 
     set_key(os.path.join(script_folder, '.env'), 'subscriptions', ','.join(subs))
 
+    logger.info('Subscribed!')
     if window:
       window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Subscribed!");')
-    
-    logger.info('Subscribed: Starting download. This may take a minute.')
-    self.downloadNewest(window)
+    elif question('Download newest episode? (y,n): '):
+      self.downloadNewest(window)
 
   def unsubscribe(self, window) -> None:
     """
