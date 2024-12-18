@@ -4,7 +4,7 @@ set -e
 
 package='podcast.py'
 
-version=0.6
+version=0.7
 
 BLACK='\033[0;30m'
 RED='\033[0;31m'
@@ -48,10 +48,10 @@ echo -e "${YELLOW}Installing requirments.txt to ${NC}${GREEN}${package}/.venv${N
 echo -e "${GREEN}${package}/requirments.txt${NC}${YELLOW} installed${NC}"
 
 echo -e "${YELLOW}Installing global commands${NC}"
-sudo ln -sfv ~/$package/sh/podcast.sh /usr/local/bin/${package}
-sudo ln -sfv ~/$package/uninstall.sh /usr/local/bin/${package}_uninstall
-sudo ln -sfv ~/$package/sh/reinstall.sh /usr/local/bin/${package}_reinstall
-sudo ln -sfv ~/$package/sh/config.sh /usr/local/bin/${package}_config
+sudo ln -sfv $HOME/$package/sh/podcast.sh /usr/local/bin/${package}
+sudo ln -sfv $HOME/$package/uninstall.sh /usr/local/bin/${package}_uninstall
+sudo ln -sfv $HOME/$package/sh/reinstall.sh /usr/local/bin/${package}_reinstall
+sudo ln -sfv $HOME/$package/sh/config.sh /usr/local/bin/${package}_config
 
 echo -e "${YELLOW}Adding execute permissions${NC}"
 chmod +x -v ./sh/*.sh
@@ -74,8 +74,29 @@ if [ "$bashrc" == "y" ] || [ "$bashrc" == "Y" ]; then
   fi
 fi
 
-echo -e "${YELLOW}Add cronjob? (y,n) will run ${NC}${CYAN}${package}${NC}${YELLOW} daily at midnight${NC}"
+echo -e "${YELLOW}Add cronjob? (y,n) will run ${NC}${CYAN}${package}${NC}${YELLOW} daily at the time you choose${NC}"
 read -r cron
 if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
-  (crontab -l 2>/dev/null; echo "0 0 * * * $package") | crontab -
+  while true; do
+      echo "Please enter an hour in 1-24 format:"
+      read -r hour
+
+      if [[ "$hour" -ge 1 && "$hour" -le 24 ]]; then
+          break
+      else
+          echo "Invalid input. Please enter a number between 1 and 24."
+      fi
+  done
+  while true; do
+      echo "Please enter minutes (0-59):"
+      read -r minutes
+
+      if [[ "$minutes" -ge 0 && "$minutes" -le 59 ]]; then
+          break
+      else
+          echo "Invalid input. Please enter a number between 0 and 59."
+      fi
+  done
+  echo -e "${YELLOW}Cronjob created!${NC}"
+  (crontab -l 2>/dev/null; echo "$hour $minutes * * * . $HOME/.bashrc; $package") | crontab -
 fi
