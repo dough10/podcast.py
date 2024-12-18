@@ -4,7 +4,7 @@ set -e
 
 package='podcast.py'
 
-version=0.7
+version=0.8
 
 BLACK='\033[0;30m'
 RED='\033[0;31m'
@@ -23,7 +23,9 @@ echo -e "${ORANGE}| | \ \  / |  | \ | |  | | | | ____ | |  | |   ${NC}";
 echo -e "${ORANGE}| | | |  | |  | | | |  | | | |  | | | |--| |   ${NC}";
 echo -e "${ORANGE}|_|_/_/  \_|__|_/ \_|__|_| |_|__|_| |_|  |_|   ${NC}";
 echo -e "${CYAN}${package}${NC}${WHITE} v${NC}${GREEN}${version}${NC}${WHITE} Envoronment Installer${NC}";
-echo -e ""
+echo ""
+echo -e "Legend: ${YELLOW}Status${NC} - ${GREEN}Paths${NC} - ${CYAN}Commands${NC} - ${GREY}Prompt for input${NC} - ${RED}Warnings${NC}"
+echo ""
 echo -e "${YELLOW}Install Dependencies${NC}"
 sudo apt-get update && sudo apt-get install git python3 python3-pip -y
 PYTHON_VERSION=$(python3 --version | awk '{print $2}' | cut -d. -f1-2)
@@ -60,7 +62,7 @@ chmod +x -v "./$package"
 
 echo -e "${YELLOW}Install complete. run ${NC}${CYAN}${package}_config${NC}${YELLOW} to configure environment.${NC}"
 
-echo -e "${YELLOW}add to ${NC}${GREEN}~/.bashrc${NC}${YELLOW}? (y,n) This will run ${NC}${CYAN}${package}${NC}${YELLOW} when terminal is opened${NC}"
+echo -e "${GREY}add to ${NC}${GREEN}~/.bashrc${NC}${GREY}? (y,n) This will run ${NC}${CYAN}${package}${NC}${GREY} when terminal is opened${NC}"
 read -r bashrc
 if [ "$bashrc" == "y" ] || [ "$bashrc" == "Y" ]; then
   echo -e "${YELLOW}Backing up ${NC}${GREEN}~/.bashrc${NC}${YELLOW} to ${NC}${GREEN}~/.bashrc-backup${NC}"
@@ -74,27 +76,27 @@ if [ "$bashrc" == "y" ] || [ "$bashrc" == "Y" ]; then
   fi
 fi
 
-echo -e "${YELLOW}Add cronjob? (y,n) will run ${NC}${CYAN}${package}${NC}${YELLOW} daily at the time you choose${NC}"
+echo -e "${GREY}Add cronjob? (y,n) will run ${NC}${CYAN}${package}${NC}${GREY} daily at the time you choose${NC}"
 read -r cron
 if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
   while true; do
-      echo "Please enter an hour in 1-24 format:"
+      echo "${GREY}Please enter an hour in 0-23 format:${NC}"
       read -r hour
 
-      if [[ "$hour" -ge 1 && "$hour" -le 24 ]]; then
+      if [[ "$hour" -ge 0 && "$hour" -le 23 ]]; then
           break
       else
-          echo "Invalid input. Please enter a number between 1 and 24."
+          echo "${RED}Invalid input. Please enter a number between 1 and 24.${NC}"
       fi
   done
   while true; do
-      echo "Please enter minutes (0-59):"
+      echo "${GREY}Please enter minutes (0-59):${NC}"
       read -r minutes
 
       if [[ "$minutes" -ge 0 && "$minutes" -le 59 ]]; then
           break
       else
-          echo "Invalid input. Please enter a number between 0 and 59."
+          echo "${RED}Invalid input. Please enter a number between 0 and 59.${NC}"
       fi
   done
   echo -e "${YELLOW}Cronjob created!${NC}"
