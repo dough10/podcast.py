@@ -80,23 +80,23 @@ echo -e "${GREY}Add cronjob? (y,n) will run ${NC}${CYAN}${package}${NC}${GREY} d
 read -r cron
 if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
   while true; do
-      echo "${GREY}Please enter an hour in 0-23 format:${NC}"
+      echo -e "${GREY}Please enter an hour in 0-23 format:${NC}"
       read -r hour
 
       if [[ "$hour" -ge 0 && "$hour" -le 23 ]]; then
           break
       else
-          echo "${RED}Invalid input. Please enter a number between 1 and 24.${NC}"
+          echo -e "${RED}Invalid input. Please enter a number between 1 and 24.${NC}"
       fi
   done
   while true; do
-      echo "${GREY}Please enter minutes (0-59):${NC}"
+      echo -e "${GREY}Please enter minutes (0-59):${NC}"
       read -r minutes
 
       if [[ "$minutes" -ge 0 && "$minutes" -le 59 ]]; then
           break
       else
-          echo "${RED}Invalid input. Please enter a number between 0 and 59.${NC}"
+          echo -e "${RED}Invalid input. Please enter a number between 0 and 59.${NC}"
       fi
   done
   echo -e "${YELLOW}Cronjob created!${NC}"
