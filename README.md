@@ -54,7 +54,7 @@ Automate subscriptions using a shell scipt
 urls=("https://feeds.megaphone.fm/VMP7924981569" "https://feed.podbean.com/tonyia/feed.xml" "https://feeds.simplecast.com/jn7O6Fnt")
 
 for url in "${urls[@]}"; do
-   podcast.py "$url" 1
+   podcast.py "$url" 1 1
 done
 
 ```
