@@ -21,4 +21,4 @@ RUN touch podcast.log
 
 RUN sh docker-sh/install.sh
 
-CMD service cron start && tail -f /podcast.py/podcast.log
+CMD cron && tail -f /podcast.py/podcast.log
