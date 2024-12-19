@@ -62,10 +62,9 @@ class Podcast:
       res.raise_for_status()
       xml = xmltodict.parse(res.content)
 
-      self.__title: str = xml['rss']['channel']['title']  # Podcast title
-      self.__list: list[dict] = xml['rss']['channel']['item']  # List of episodes
-      self.__location: str = os.path.join(self.__podcast_folder, format_filename(self.__title))  # Folder path for the podcast
-
+      self.__title: str = xml['rss']['channel']['title']
+      self.__list: list[dict] = xml['rss']['channel']['item']
+      self.__location: str = os.path.join(self.__podcast_folder, format_filename(self.__title))
 
       self.__img_url: str = get_image_url(xml)
       if not self.__img_url:
@@ -73,14 +72,14 @@ class Podcast:
 
       logger.info(f'{self.__title}: {str(self.episodeCount())} episodes')
 
-    except requests.exceptions.RequestException:
-      raise
-    except ValueError:
-      raise
-    except KeyError:
-      raise
-    except Exception:
-      raise
+    except requests.exceptions.RequestException as e:
+      raise Exception(f'Error getting XML data from {self.__xml_url}: {e}')
+    except ValueError as e:
+      raise Exception(f'Failed parsing XML from {self.__xml_url}: {e}')
+    except KeyError as e:
+      raise KeyError(f'Failed parsing key: {e}')
+    except Exception as e:
+      raise Exception(f'Unexpected error: {e}')
     
   def __fallback_image(self, file) -> None:
     """
