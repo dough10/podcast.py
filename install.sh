@@ -100,5 +100,5 @@ if [ "$cron" == "y" ] || [ "$cron" == "Y" ]; then
       fi
   done
   echo -e "${YELLOW}Cronjob created!${NC}"
-  (crontab -l 2>/dev/null; echo "$hour $minutes * * * . $HOME/.bashrc; $package") | crontab -
+  (crontab -l 2>/dev/null; echo "$minutes $hour * * * . $HOME/.bashrc; $package") | crontab -
 fi
