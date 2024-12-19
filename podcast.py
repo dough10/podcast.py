@@ -322,7 +322,10 @@ def main() -> None:
       while True:
         answer = action if action else input("Choose an option: subscribe: 1, unsubscribe: 2, download all: 3, download newest: 4 - ")
         if answer in options:
-          options[answer]()
+          try:
+            options[answer]()
+          except Exception as e:
+            logger.critical(f'Failed running podcast.py: {e}')
           break
         else:
           action = None
@@ -332,13 +335,14 @@ def main() -> None:
       subs = subscriptions()
 
       for url in subs:
-        Podcast(url).downloadNewest(False)
+        try:
+          Podcast(url).downloadNewest(False)
+        except Exception as e:
+          logger.critical(f'Failed running podcast.py: {e}')
         
       if not len(subs):
         logger.info('No subscriptions found.')
 
-  except Exception as e:
-    logger.critical(f'Failed running podcast.py: {e}')
 
   except KeyboardInterrupt:
     pass
