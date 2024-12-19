@@ -73,12 +73,14 @@ class Podcast:
 
       logger.info(f'{self.__title}: {str(self.episodeCount())} episodes')
 
-    except requests.exceptions.RequestException as e:
-      raise Exception(f'Error getting XML data from {self.__xml_url}: {e}')
-    except ValueError as e:
-      raise Exception(f'Failed parsing XML from {self.__xml_url}: {e}')
-    except Exception as e:
-      raise Exception(f'Unexpected error: {e}')
+    except requests.exceptions.RequestException:
+      raise
+    except ValueError:
+      raise
+    except KeyError:
+      raise
+    except Exception:
+      raise
     
   def __fallback_image(self, file) -> None:
     """
