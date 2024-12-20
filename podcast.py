@@ -326,7 +326,7 @@ def main() -> None:
           try:
             options[answer]()
           except Exception as e:
-            logger.critical(f'Failed running podcast.py: {e}')
+            logger.critical(f'podcast.py failed: {e}')
           break
         else:
           action = None
@@ -339,7 +339,7 @@ def main() -> None:
         try:
           Podcast(url).downloadNewest(False)
         except Exception as e:
-          logger.critical(f'Failed running podcast.py: {e}')
+          logger.critical(f'podcast.py failed: {e}')
         
       if not len(subs):
         logger.info('No subscriptions found.')
