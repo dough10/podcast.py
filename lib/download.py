@@ -164,11 +164,11 @@ def dl_with_progress_bar(url: str, path: str, progress_callback=None, max_retrie
 
     except requests.exceptions.RequestException as e:
       retries += 1  # Increment retry counter
-      logger.error(f"ERROR: An error occurred during the download: {str(e)} (Retry {retries}/{max_retries})")
+      logger.error(f"An error occurred during the download: {str(e)} (Retry {retries}/{max_retries})")
 
       # Retry if the max retries have not been reached
       if retries >= max_retries:
-        logger.error(f"ERROR: Maximum ({max_retries}) retries reached. Download failed.")
+        logger.error(f"Maximum ({max_retries}) retries reached. Download failed.")
         raise DownloadError(f"Download failed after {max_retries} retries.")
       
       # Wait before retrying
