@@ -27,12 +27,7 @@ echo ""
 echo -e "Legend: ${YELLOW}Status${NC} - ${GREEN}Paths${NC} - ${CYAN}Commands${NC} - ${GREY}Prompt for input${NC} - ${RED}Warnings${NC}"
 echo ""
 echo -e "${YELLOW}Install Dependencies${NC}"
-sudo apt-get update && sudo apt-get install git python3 python3-pip -y
-PYTHON_VERSION=$(python3 --version | awk '{print $2}' | cut -d. -f1-2)
-PYTHON_VENV_PACKAGE="python${PYTHON_VERSION}-venv"
-if ! sudo apt-get install "$PYTHON_VENV_PACKAGE" -y; then
-  echo -e "${RED}Warning: ${NC}${GREY}${PYTHON_VENV_PACKAGE}${NC}${RED} installation failed. Attempting to continue...${NC}"
-fi
+sudo apt-get update && sudo apt-get install git python3 python3-pip python-env -y
 echo -e "${YELLOW}Dependencies Installed${NC}"
 
 echo -e "${YELLOW}Cloning Github repo${NC}"
