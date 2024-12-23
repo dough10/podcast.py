@@ -4,7 +4,7 @@ set -e
 
 package='podcast.py'
 
-version=0.8
+version=0.9
 
 BLACK='\033[0;30m'
 RED='\033[0;31m'
