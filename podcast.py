@@ -225,7 +225,7 @@ class Podcast:
           except:
             pass
       else:
-        logger.warning(f'You are not subscribed to {self.__xml_url}.')
+        logger.info(f'You are not subscribed to {self.__xml_url}.')
 
     if window:
       go()
