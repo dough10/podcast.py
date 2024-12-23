@@ -201,7 +201,7 @@ class Podcast:
     logger.info('Subscribed!')
     if window:
       window.evaluate_js(f'document.querySelector("audiosync-podcasts").subResponse("Subscribed!");')
-    elif int(confirmation) or question('Download newest episode? (y,n): '):
+    elif confirmation == '1' or question('Download newest episode? (y,n): '):
       self.downloadNewest(window)
 
   def unsubscribe(self, window, confirmation:str) -> None:
@@ -231,9 +231,9 @@ class Podcast:
       go()
       return
 
-    if int(confirmation) or question(f'is "{self.__title}" the right podcast? (yes/no) '):
+    if confirmation == '1' or question(f'is "{self.__title}" the right podcast? (yes/no) '):
       go()
-      if int(confirmation) or question('Remove all downloaded files? (yes/no) ') and question('Files cannot be recovered. Are you sure? (yes/no) '):
+      if confirmation == '1' or question('Remove all downloaded files? (yes/no) ') and question('Files cannot be recovered. Are you sure? (yes/no) '):
         try:
           shutil.rmtree(self.__location)
           logger.info(f'Deleting directory {self.__location}')
