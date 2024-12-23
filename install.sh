@@ -27,7 +27,7 @@ echo ""
 echo -e "Legend: ${YELLOW}Status${NC} - ${GREEN}Paths${NC} - ${CYAN}Commands${NC} - ${GREY}Prompt for input${NC} - ${RED}Warnings${NC}"
 echo ""
 echo -e "${YELLOW}Install Dependencies${NC}"
-sudo apt-get update && sudo apt-get install git python3 python3-pip python-env -y
+sudo apt-get update && sudo apt-get install git python3 python3-pip python3-env -y
 echo -e "${YELLOW}Dependencies Installed${NC}"
 
 echo -e "${YELLOW}Cloning Github repo${NC}"
