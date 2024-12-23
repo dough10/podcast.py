@@ -50,10 +50,10 @@ echo -e "${YELLOW}Installing requirments.txt to ${NC}${GREEN}${package}/.venv${N
 echo -e "${GREEN}${package}/requirments.txt${NC}${YELLOW} installed${NC}"
 
 echo -e "${YELLOW}Installing global commands${NC}"
-sudo ln -sfv $HOME/$package/sh/podcast.sh /usr/local/bin/${package}
-sudo ln -sfv $HOME/$package/uninstall.sh /usr/local/bin/${package}_uninstall
-sudo ln -sfv $HOME/$package/sh/reinstall.sh /usr/local/bin/${package}_reinstall
-sudo ln -sfv $HOME/$package/sh/config.sh /usr/local/bin/${package}_config
+sudo ln -sfv "$HOME/$package/sh/podcast.sh" "/usr/local/bin/${package}"
+sudo ln -sfv "$HOME/$package/uninstall.sh" "/usr/local/bin/${package}_uninstall"
+sudo ln -sfv "$HOME/$package/sh/reinstall.sh" "/usr/local/bin/${package}_reinstall"
+sudo ln -sfv "$HOME/$package/sh/config.sh" "/usr/local/bin/${package}_config"
 
 echo -e "${YELLOW}Adding execute permissions${NC}"
 chmod +x -v ./sh/*.sh
